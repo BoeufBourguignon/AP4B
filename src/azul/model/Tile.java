@@ -8,7 +8,7 @@ package azul.model;
 
 public class Tile 
 {
-	private TileType type;
+	private final TileType type;
 	
 	/**
 	 * Constructeur surchargé avec le type de la Tile
