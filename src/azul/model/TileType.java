@@ -1,11 +1,11 @@
-package azul.model;
+public enum TileType {
 
-public enum TileType 
-{
-	TCS,
-	AP,
-	N,
-	IS,
-	HS,
-	First
+    TCS,
+    AP,
+    N,
+    IS,
+    HS,
+    First,
+    Empty;
+
 }
