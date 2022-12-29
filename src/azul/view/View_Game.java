@@ -1,5 +1,7 @@
 package azul.view;
 
+import azul.model.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -9,15 +11,17 @@ public class View_Game extends JFrame
     private ArrayList<View_Gameboard> listGameboards;
     private ArrayList<View_Disk> listDisks;
 
-    public View_Game(int nbJoueurs)
+    public View_Game(ArrayList<Player> players)
     {
         super("AZUL UTBM");
 
         setLayout(new BorderLayout());
 
+        // Partie supérieure : Les disques
+        int nbDisk = 2 * players.size() + 1;
         JPanel panDisks = new JPanel();
         listDisks = new ArrayList<>();
-        for(int i = 0; i < 2 * nbJoueurs + 1; ++i)
+        for(int i = 0; i < nbDisk; ++i)
         {
             View_Disk d = new View_Disk();
             listDisks.add(d);

@@ -4,37 +4,32 @@ import azul.model.*;
 import azul.view.*;
 
 import javax.swing.*;
+import java.util.ArrayList;
 
 public class AzulController
 {
     private Game game;
-    private View_Accueil view_accueil;
-    private View_Game view_game;
+    private JFrame window;
 
     public AzulController()
     {
         game = new Game();
 
-        view_accueil = new View_Accueil();
+        window = new View_Accueil();
 
-        SetListeners_Accueil();
+        ((View_Accueil) window).getBtnValider().addActionListener(e -> {
+            // On crée les classes "Player"
+            ArrayList<Player> players = new ArrayList<>();
+            ((View_Accueil) window).getPseudos().forEach(pseudo -> players.add(new Player(pseudo)));
 
-        view_accueil.setVisible(true);
-    }
+            // On crée la fenêtre de jeu, avec tous les joueurs
+            window = new View_Game(players);
 
-    private void SetListeners_Accueil()
-    {
-        view_accueil.getBtnDeuxJoueurs().addActionListener(e -> StartGame(2));
-        view_accueil.getBtnTroisJoueurs().addActionListener(e -> StartGame(3));
-        view_accueil.getBtnQuatreJoueurs().addActionListener(e -> StartGame(4));
-    }
+            // Events de view_game
 
-    private void StartGame(int nbJoueurs)
-    {
-        view_accueil.dispose();
+            window.setVisible(true);
+        });
 
-        view_game = new View_Game(nbJoueurs);
-
-        view_game.setVisible(true);
+        window.setVisible(true);
     }
 }
