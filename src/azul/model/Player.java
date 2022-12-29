@@ -1,6 +1,6 @@
 package azul.model;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class Player
 {
@@ -29,11 +29,11 @@ public class Player
         return this.gameboard;
     }
 
-    public ArrayList<Tile> pickTiles(Disk disk, TileType tileType)
+    public List<Tile> pickTiles(Disk disk, TileType tileType)
             throws Exception
     {
         // Pioche les tuiles
-        ArrayList<Tile> pickedTiles = disk.find(tileType);
+        List<Tile> pickedTiles = disk.find(tileType);
 
         // Vérifie que des tuiles ont été piochées
         if(pickedTiles.size() == 0)

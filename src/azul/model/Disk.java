@@ -1,10 +1,10 @@
 package azul.model;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class Disk
 {
-    public ArrayList<Tile> find(TileType type)
+    public List<Tile> find(TileType type)
     {
         throw new UnsupportedOperationException();
     }
