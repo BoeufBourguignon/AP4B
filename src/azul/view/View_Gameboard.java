@@ -17,11 +17,11 @@ class View_Gameboard
             for(int j = 0; j < 5; ++j)
             {
                 // Instancier le bouton
-                JButton btn = new JButton();
+                JPanel btn = new JPanel();
                 btn.setPreferredSize(new Dimension(btnSize, btnSize));
                 wall.add(btn);
                 // Colorier le bouton
-                switch ((i + j) % 5)
+                switch ((5 + (i - j)) % 5)
                 {
                     case 0 -> btn.setBackground(Color.BLUE);
                     case 1 -> btn.setBackground(Color.YELLOW);
@@ -75,5 +75,16 @@ class View_Gameboard
             btnSize = 25;
         else
             btnSize = 50;
+    }
+
+    public static void main(String[] args)
+    {
+        JFrame f = new JFrame();
+        View_Gameboard gb = new View_Gameboard();
+        f.setContentPane(gb.Draw_Gameboard());
+
+        f.pack();
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
     }
 }

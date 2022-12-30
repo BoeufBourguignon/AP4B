@@ -18,18 +18,30 @@ public class AzulController
         window = new View_Accueil();
 
         ((View_Accueil) window).getBtnValider().addActionListener(e -> {
-            // On crée les classes "Player"
-            ArrayList<Player> players = new ArrayList<>();
-            ((View_Accueil) window).getPseudos().forEach(pseudo -> players.add(new Player(pseudo)));
+            // On vérifie les pseudos
+            if(((View_Accueil) window).verifyPseudos())
+            {
+                // On crée les classes "Player"
+                ((View_Accueil) window).getPseudos().forEach(pseudo -> game.addPlayer(new Player(pseudo)));
 
-            // On crée la fenêtre de jeu, avec tous les joueurs
-            window = new View_Game(players);
+                // On crée la fenêtre de jeu
+                window = new View_Game(game);
+                View_Game V_Game = ((View_Game) window);
 
-            // Events de view_game
+                initGame();
 
-            window.setVisible(true);
+                // Events de view_game
+
+                window.setVisible(true);
+            }
         });
 
         window.setVisible(true);
+    }
+
+    public void initGame()
+    {
+        game.initGame();
+        ((View_Game) window).initGame();
     }
 }

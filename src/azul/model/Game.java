@@ -9,4 +9,18 @@ public class Game
         throw new UnsupportedOperationException();
     }
 
+    public ArrayList<Disk> getDisks()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void initGame()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void addPlayer(Player player)
+    {
+        throw new UnsupportedOperationException();
+    }
 }

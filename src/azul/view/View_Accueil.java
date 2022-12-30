@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class View_Accueil extends JFrame
 {
+    JLabel lblVerifyPseudos;
     private final JButton btnValider = new JButton("Valider");
     private ArrayList<JTextField> listePseudos = new ArrayList<>();
 
@@ -44,6 +45,40 @@ public class View_Accueil extends JFrame
     {
         pack();
         setSize(new Dimension((int)(getWidth() * 1.5), (int)(getHeight() * 1.5)));
+    }
+
+    public boolean verifyPseudos()
+    {
+        boolean isVerified = false;
+        if(getContentPane() instanceof PanPseudosJoueurs)
+        {
+            isVerified = true;
+            ArrayList<String> pseudos = getPseudos();
+            for(int i = 0; i < pseudos.size() -1; ++i)
+            {
+                String pseudoToCompare = pseudos.get(i);
+
+                // Pseudo vide ?
+                if(pseudoToCompare.length() == 0)
+                {
+                    isVerified = false;
+                    break;
+                }
+
+                // Pseudos identiques ?
+                for(int j = i + 1; j < pseudos.size(); ++j)
+                {
+                    if (pseudoToCompare.equals(pseudos.get(j)))
+                    {
+                        isVerified = false;
+                        break;
+                    }
+                }
+            }
+            // Montre ou cache le message d'alerte
+            lblVerifyPseudos.setVisible(!isVerified);
+        }
+        return isVerified;
     }
 
     private class PanNbJoueurs extends JPanel
@@ -94,6 +129,13 @@ public class View_Accueil extends JFrame
                 listePseudos.add(txtTmp);
                 add(panTmp);
             }
+
+            JPanel panVerifyPseudos = new JPanel();
+            lblVerifyPseudos = new JLabel("Les pseudos ne sont pas corrects");
+            lblVerifyPseudos.setForeground(Color.RED);
+            lblVerifyPseudos.setVisible(false);
+            panVerifyPseudos.add(lblVerifyPseudos);
+            add(panVerifyPseudos);
 
             JPanel panBtns = new JPanel();
             JButton btnRetour = new JButton("Retour");
