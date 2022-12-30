@@ -1,5 +1,7 @@
+package azul.model;
+
 import java.util.*;
-import java.lang.Math;
+
 public class Deck {
 
     private ArrayList<Tile> deck;
