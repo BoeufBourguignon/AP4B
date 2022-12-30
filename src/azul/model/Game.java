@@ -5,8 +5,9 @@ import java.util.*;
 public class Game {
     private int nbPlayer;
     private int nbDisk;
+    private Deck deck;
     private final ArrayList<Player> players;
-    private List<Disk> disks;
+    private ArrayList<Disk> disks;
 
     public Game()
     {
@@ -17,23 +18,29 @@ public class Game {
     }
 
     public void initGame()
+            throws Exception
     {
-        switch(nbPlayer)
-        {
-            case 2:
-                nbDisk=5;
-                break;
-            case 3 :
-                nbDisk=7;
-                break;
-            case 4:
-                nbDisk=9;
-                break;
-            default:
-                break;
-        }
+        nbPlayer = players.size();
 
-        disks = new ArrayList<>(nbDisk);
+        // Vérification nombre de joueurs
+        if(nbPlayer < 2 || nbPlayer > 5)
+            throw new Exception("Nombre illégal de joueurs");
+
+        // Instanciation du deck
+        deck = new Deck();
+
+        // Instanciation des disks
+        nbDisk = 2 * nbPlayer + 1;
+        disks = new ArrayList<>();
+        for(int i = 0; i < nbDisk; ++i)
+        {
+            Disk d = new Disk();
+            disks.add(d);
+            for(int j = 0; j < 4; ++j)
+            {
+                d.add(deck.drawTile());
+            }
+        }
     }
 
     public void setNbPlayer(int nbPlayer) {
@@ -68,7 +75,7 @@ public class Game {
         return firstPlayer;
     }
 
-    public List<Disk> getDisks()
+    public ArrayList<Disk> getDisks()
     {
         return disks;
     }

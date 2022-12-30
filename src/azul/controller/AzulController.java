@@ -21,14 +21,26 @@ public class AzulController
             // On vérifie les pseudos
             if(((View_Accueil) window).verifyPseudos())
             {
-                // On crée les classes "Player"
+                window.dispose();
+
+                // On crée les classes "Player" et on les ajoute au Game
                 ((View_Accueil) window).getPseudos().forEach(pseudo -> game.addPlayer(new Player(pseudo)));
 
                 // On crée la fenêtre de jeu
                 window = new View_Game(game);
                 View_Game V_Game = ((View_Game) window);
 
-                initGame();
+                try
+                {
+                    initGame();
+                }
+                catch(Exception ex)
+                {
+                    JOptionPane.showMessageDialog(window,
+                            ex.getMessage(),
+                            "Erreur",
+                            JOptionPane.ERROR_MESSAGE);
+                }
 
                 // Events de view_game
 
@@ -39,7 +51,7 @@ public class AzulController
         window.setVisible(true);
     }
 
-    public void initGame()
+    public void initGame() throws Exception
     {
         game.initGame();
         ((View_Game) window).initGame();

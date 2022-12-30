@@ -6,8 +6,20 @@ public class Deck {
 
     private ArrayList<Tile> deck;
 
-    public Deck(){
+    public Deck()
+    {
+        this.deck = new ArrayList<>();
 
+        for(int i = 0; i < 20; ++i)
+        {
+            this.deck.add(new Tile(TileType.AP));
+            this.deck.add(new Tile(TileType.TCS));
+            this.deck.add(new Tile(TileType.N));
+            this.deck.add(new Tile(TileType.IS));
+            this.deck.add(new Tile(TileType.HS));
+        }
+
+        /*
         //----- création de la "liste" deck contenant 4 Tiles
         this.deck = new ArrayList<>();
 
@@ -49,6 +61,7 @@ public class Deck {
             deck.add(t_hs);
             compteur_tiles++;
         }
+        */
     }
 
     public List<Tile>getDeck(){

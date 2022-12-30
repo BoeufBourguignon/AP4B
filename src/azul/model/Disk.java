@@ -1,26 +1,16 @@
 package azul.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static java.lang.Math.random;
 
 public class Disk {
         
-        private List<Tile> disk;
-        private Deck deck;
+        private ArrayList<Tile> disk;
 
         public Disk()
         {
-            for (int i=0; i<4; i++)
-            {
-                int rand = (int) Math.random()*(100);
-                if (deck.getDeck().get(rand).getType()!=TileType.First)
-                {
-                    disk.add(deck.getDeck().get(rand));
-                }
-            }
+            disk = new ArrayList<>();
         }
 
         public List<Tile> find (TileType type)
@@ -34,6 +24,11 @@ public class Disk {
                 }
             }
             return TypeOndisk;
+        }
+
+        public void add(Tile tile)
+        {
+            disk.add(tile);
         }
 
         public List<Tile> getTiles()

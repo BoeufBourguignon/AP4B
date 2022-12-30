@@ -29,22 +29,27 @@ public class View_Game extends JFrame
 
         this.game = game;
 
-        setLayout(new GridLayout(2,1));
+        JPanel container = new JPanel();
+        JScrollPane scrl = new JScrollPane(container);
+        add(scrl);
+
+        container.setLayout(new GridLayout(2,1));
 
         // Partie supérieure : Les disques
         panDisks = new JPanel();
-        add(panDisks);
+        container.add(panDisks);
 
         // Partie inférieure : Les gameboards
         panGameboards = new JPanel();
-        add(panGameboards);
+        container.add(panGameboards);
 
-        pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public void initGame()
     {
+        panDisks.add(new JLabel("Test"));
+
         // Utilisé une fois pour charger les disques
         game.getDisks().forEach(disk -> {
             PanDisk d = new PanDisk(disk);
@@ -55,8 +60,13 @@ public class View_Game extends JFrame
         game.getPlayers().forEach(player -> {
             PanGameboard gb = new PanGameboard(player.getGameboard());
             listBtnsGameboards.add(gb.listRowsBtns);
+            gb.setBorder(BorderFactory.createLineBorder(Color.black));
             panGameboards.add(gb);
         });
+//        gb.setBorder(BorderFactory.createLineBorder(Color.black));
+//        gb.add(new JLabel("TEST"));
+
+        pack();
     }
 
     public void drawDisks()
@@ -115,9 +125,10 @@ public class View_Game extends JFrame
 
             disk.getTiles().forEach(tile ->
             {
-                JButton t = new JButton();
+                JButton t = new JButton(tile.getType().toString());
+                t.setMargin(new Insets(1,1,1,1));
                 t.setPreferredSize(dimTile);
-                t.setForeground(getTileColor(tile.getType()));
+                t.setBackground(getTileColor(tile.getType()));
                 listTilesBtns.add(t);
                 add(t);
             });
@@ -142,10 +153,10 @@ public class View_Game extends JFrame
             panBtns = new JPanel();
             panWall = new JPanel();
 
-            setLayout(new GridLayout(1,3));
+            //setLayout(new GridLayout(1,3));
 
             add(panStock);
-            add(panWall);
+            add(panBtns);
             add(panWall);
 
             drawStock();
@@ -158,18 +169,15 @@ public class View_Game extends JFrame
             panStock.removeAll();
 
             ArrayList<ArrayList<Tile>> stock = gb.getStock();
-            JPanel panStock = new JPanel();
             panStock.setLayout(new GridLayout(5, 1));
             for(int i = 0; i < 5; ++i)
             {
-                for(int j = 0; j < i + 1; j++)
+                for(int j = 0; j < 5; j++)
                 {
                     JPanel panTileTmp = new JPanel();
                     panTileTmp.setPreferredSize(dimTile);
                     if(j >= 4 - i)
-                    {
-                        panTileTmp.setBackground(getTileColor(stock.get(i).get(j).getType()));
-                    }
+                        panTileTmp.setBackground(getTileColor(stock.get(i).get((i + j) % 4).getType()));
                     panStock.add(panTileTmp);
                 }
             }
@@ -180,7 +188,6 @@ public class View_Game extends JFrame
             panWall.removeAll();
 
             ArrayList<ArrayList<Tile>> wall = gb.getWall();
-            JPanel panWall = new JPanel();
             panWall.setLayout(new GridLayout(5, 5));
             for(int i = 0; i < 5; ++i)
             {
@@ -216,6 +223,7 @@ public class View_Game extends JFrame
             for(int i = 0; i < 5; ++i)
             {
                 JButton btn = new JButton();
+                btn.setPreferredSize(dimTile);
                 panBtns.add(btn);
                 listRowsBtns.add(btn);
             }
