@@ -24,6 +24,11 @@ public class Player
         return this.isFirstPlayer;
     }
 
+    public void setFirstPlayer(boolean isFirstPlayer)
+    {
+        this.isFirstPlayer = isFirstPlayer;
+    }
+
     public Gameboard getGameboard()
     {
         return this.gameboard;

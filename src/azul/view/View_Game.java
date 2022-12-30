@@ -14,13 +14,13 @@ public class View_Game extends JFrame
 
     // Gameboards
     private final JPanel panGameboards;
-    private ArrayList<ArrayList<JButton>> listBtnsGameboards;
-    private ArrayList<PanGameboard> listPanGameboard;
+    private ArrayList<ArrayList<JButton>> listBtnsGameboards = new ArrayList<>();
+    private ArrayList<PanGameboard> listPanGameboard = new ArrayList<>();
 
     // Disks
     private final JPanel panDisks; // Panneau d'affichage des disks
-    private ArrayList<ArrayList<JButton>> listBtnsDisks; // Pour les events
-    private ArrayList<PanDisk> listPanDisks; // Pour draw les disks
+    private ArrayList<ArrayList<JButton>> listBtnsDisks = new ArrayList<>(); // Pour les events
+    private ArrayList<PanDisk> listPanDisks = new ArrayList<>(); // Pour draw les disks
 
 
     public View_Game(Game game)
@@ -48,7 +48,6 @@ public class View_Game extends JFrame
         // Utilisé une fois pour charger les disques
         game.getDisks().forEach(disk -> {
             PanDisk d = new PanDisk(disk);
-            listBtnsDisks.add(d.listTilesBtns);
             panDisks.add(d);
         });
 
@@ -85,17 +84,25 @@ public class View_Game extends JFrame
     }
 
 
+
+
+    //******************************************
+    //              INNER CLASSES
+    //******************************************
+
     /**
      * JPanel illustrant un seul disk
      */
     private class PanDisk extends JPanel
     {
         private final Disk disk;
-        private final ArrayList<JButton> listTilesBtns = new ArrayList<>();
+        private final ArrayList<JButton> listTilesBtns = new ArrayList<>(); // On garde les boutons pour faire les events
 
         public PanDisk(Disk disk)
         {
             this.disk = disk;
+            listBtnsDisks.add(listTilesBtns);
+            listPanDisks.add(this);
 
             setLayout(new GridLayout(2,2));
 
@@ -104,9 +111,9 @@ public class View_Game extends JFrame
 
         public void drawDisk()
         {
-            ArrayList<Tile> tiles = disk.getTiles();
+            removeAll();
 
-            tiles.forEach(tile ->
+            disk.getTiles().forEach(tile ->
             {
                 JButton t = new JButton();
                 t.setPreferredSize(dimTile);
@@ -121,17 +128,24 @@ public class View_Game extends JFrame
     {
         private final Gameboard gb;
         private final JPanel panStock;
+        private final JPanel panBtns;
         private final JPanel panWall;
         private final ArrayList<JButton> listRowsBtns = new ArrayList<>();
 
         public PanGameboard(Gameboard gb)
         {
             this.gb = gb;
+            listBtnsGameboards.add(listRowsBtns);
+            listPanGameboard.add(this);
 
             panStock = new JPanel();
+            panBtns = new JPanel();
             panWall = new JPanel();
 
+            setLayout(new GridLayout(1,3));
+
             add(panStock);
+            add(panWall);
             add(panWall);
 
             drawStock();
@@ -148,7 +162,7 @@ public class View_Game extends JFrame
             panStock.setLayout(new GridLayout(5, 1));
             for(int i = 0; i < 5; ++i)
             {
-                for(int j = 0; j < 5; j++)
+                for(int j = 0; j < i + 1; j++)
                 {
                     JPanel panTileTmp = new JPanel();
                     panTileTmp.setPreferredSize(dimTile);
@@ -198,7 +212,6 @@ public class View_Game extends JFrame
 
         private void drawBtns()
         {
-            JPanel panBtns = new JPanel();
             panBtns.setLayout(new GridLayout(5,1));
             for(int i = 0; i < 5; ++i)
             {
@@ -206,7 +219,6 @@ public class View_Game extends JFrame
                 panBtns.add(btn);
                 listRowsBtns.add(btn);
             }
-            add(panBtns);
         }
     }
 }

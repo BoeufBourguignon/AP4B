@@ -1,4 +1,5 @@
 package azul.model;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -33,6 +34,11 @@ public class Disk {
                 }
             }
             return TypeOndisk;
+        }
+
+        public List<Tile> getTiles()
+        {
+            return disk;
         }
 }
 

@@ -1,8 +1,7 @@
-package azul.view;
+package azul.view.game;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 class View_Gameboard
 {

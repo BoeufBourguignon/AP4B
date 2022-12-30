@@ -1,4 +1,4 @@
-package azul.view;
+package azul.view.game;
 
 import java.awt.*;
 import java.util.ArrayList;

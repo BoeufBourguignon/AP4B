@@ -5,11 +5,13 @@ import java.util.*;
 public class Game {
     private int nbPlayer;
     private int nbDisk;
-    private List<Player> players;
+    private final ArrayList<Player> players;
     private List<Disk> disks;
 
     public Game()
     {
+        players = new ArrayList<>();
+
         nbPlayer=0;
         nbDisk=0;
     }
@@ -40,7 +42,7 @@ public class Game {
 
     public void setFirstPlayer(Player player)
     {
-        player.isFirstPlayer=true;
+        player.setFirstPlayer(true);
     }
 
     public void addPlayer(Player player)
@@ -55,14 +57,15 @@ public class Game {
 
     public Player getFirstPlayer()
     {
-        for (int i=0; i<players.size(); i++)
-        {
-            if (players.get(i).isFirstPlayer==true)
-            {
-                return players.get(i);
-            }
-        }
-        return null;
+        Player firstPlayer = null;
+
+        int i = 0;
+        while(i < players.size() - 1 && !players.get(i).isFirstPlayer())
+            ++i;
+        if(players.get(i).isFirstPlayer())
+            firstPlayer = players.get(i);
+
+        return firstPlayer;
     }
 
     public List<Disk> getDisks()
