@@ -263,23 +263,27 @@ public class Gameboard {
     }
     public boolean checkColonnePleine(int colonne){ // check si une ligne est pleine
 
-
+        int compteur_colonne = 1;
         for(int i = 0 ;i < 5;i++){
 
-            int compteur_colonne = 0;
-            if( (this.wall.get(i).get(colonne).getType()  != TileType.Empty) ){
 
-                compteur_colonne ++ ;
-                if (compteur_colonne == 5){ // ???
+            if( (this.wall.get(i).get(colonne).getType()  != TileType.Empty) ) {
 
-                    return true;
-                }
+                compteur_colonne++;
+            }
+            else{
+                colonne ++;
+                compteur_colonne = 1;
             }
 
-            colonne ++;
+        }
+        
+        if (compteur_colonne == 5){ //colonne pleine ?
 
+            return true;
         }
         return false;
+
     }
 
     public void computeScore(){
