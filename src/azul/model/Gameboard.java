@@ -1,3 +1,5 @@
+package model;
+
 import java.util.*;
 
 public class Gameboard {
@@ -12,6 +14,8 @@ public class Gameboard {
 
     //mur de "référence", pour savoir comment doivent être disposé les tiles sur le mur final
     private ArrayList<ArrayList<TileType>>  reference_wall;
+
+    private int compteur_lignes_completes;
 
 
     //-----Méthodes-----
@@ -97,6 +101,10 @@ public class Gameboard {
         return wall;
     }
 
+    public int getCompteur_lignes_completes() {
+        return compteur_lignes_completes;
+    }
+
     /**
      * Accesseur du Malus du Gameboard
      *
@@ -148,7 +156,7 @@ public class Gameboard {
         //check disponibilité de la ligne stockLine:
         if (wall.get(stockLine).contains(type) || (stock.get(stockLine).get(0).getType() != type && stock.get(stockLine).get(0).getType() != TileType.Empty )   ) { //vérifie si le mur contient déjà une tile du même type sur la ligne "stockline" OU si la ligne du stock  contient déjà  un autre type
 
-           return false; //échec de l'ajout dans la ligne souhaité
+            return false; //échec de l'ajout dans la ligne souhaité
         }
 
         //cas où la liste est trop longue par rapport à la ligne dans le stock
@@ -190,8 +198,9 @@ public class Gameboard {
 
                 for(int j = 0;j < taille_ligne;j++){
 
-                    stock.get(i).remove(j);
                     stock.get(i).add(j,tile_remplacement);
+                    stock.get(i).remove(j);
+
                 }
             }
             taille_ligne++; //la ligne suivante contient 1 élément en +
@@ -239,5 +248,88 @@ public class Gameboard {
             taille_ligne+=1; // la ligne suivante contient 1 élément en +
         }
     }
+
+
+
+    public boolean checkLignePleine(int ligne){ // check si une ligne est pleine
+
+
+        if( (this.wall.get(ligne).get(0).getType() != TileType.Empty)&& (this.wall.get(ligne).get(1).getType() != TileType.Empty) &&(this.wall.get(ligne).get(2).getType() != TileType.Empty) && (this.wall.get(ligne).get(3).getType() != TileType.Empty) && (this.wall.get(ligne).get(4).getType() != TileType.Empty) ){
+
+            return true;
+        }
+
+        return false;
+    }
+    public boolean checkColonnePleine(int colonne){ // check si une ligne est pleine
+
+
+        for(int i = 0 ;i < 5;i++){
+
+            int compteur_colonne = 0;
+            if( (this.wall.get(i).get(colonne).getType()  != TileType.Empty) ){
+
+                compteur_colonne ++ ;
+                if (compteur_colonne == 5){ // ???
+
+                    return true;
+                }
+            }
+
+            colonne ++;
+
+        }
+        return false;
+    }
+
+    public void computeScore(){
+
+
+        for(int ligne = 0;ligne<5;ligne++){
+            if(checkLignePleine(ligne)){
+                this.compteur_lignes_completes ++;
+
+                if(this.compteur_lignes_completes<2){
+                    this.score +=5;
+                }else{
+                    this.score+=2;
+                }
+
+            }
+        }
+
+        for(int colonne = 0;colonne <5; colonne++){
+
+            if (checkColonnePleine(colonne) ){
+                this.score+=7;
+            }
+        }
+
+        //on teste si chaque tile est présente 5fois dans le mur, si oui on ajoute 10 au score, sinon on fait rien
+        if( Collections.frequency(this.wall,TileType.TCS) == 5){
+
+            this.score +=10;
+        }
+
+        if( Collections.frequency(this.wall,TileType.AP) == 5){
+
+            this.score +=10;
+        }
+
+        if( Collections.frequency(this.wall,TileType.N) == 5){
+
+            this.score +=10;
+        }
+
+        if( Collections.frequency(this.wall,TileType.IS) == 5){
+
+            this.score +=10;
+        }
+
+        if( Collections.frequency(this.wall,TileType.HS) == 5){
+
+            this.score +=10;
+        }
+
+    }
 }
-	
