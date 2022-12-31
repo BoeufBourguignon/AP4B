@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Deck {
 
-    private ArrayList<Tile> deck;
+    private final ArrayList<Tile> deck;
 
     public Deck()
     {

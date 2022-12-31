@@ -4,7 +4,7 @@ import azul.model.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 
 public class View_Game extends JFrame
 {
@@ -14,13 +14,12 @@ public class View_Game extends JFrame
 
     // Gameboards
     private final JPanel panGameboards;
-    private ArrayList<ArrayList<JButton>> listBtnsGameboards = new ArrayList<>();
-    private ArrayList<PanGameboard> listPanGameboard = new ArrayList<>();
+    private HashMap<Player, PanGameboard> listPanGameboards = new HashMap<>();
+
 
     // Disks
     private final JPanel panDisks; // Panneau d'affichage des disks
-    private ArrayList<ArrayList<JButton>> listBtnsDisks = new ArrayList<>(); // Pour les events
-    private ArrayList<PanDisk> listPanDisks = new ArrayList<>(); // Pour draw les disks
+    private ArrayList<PanDisk> listPanDisks = new ArrayList<>();
 
 
     public View_Game(Game game)
@@ -48,19 +47,18 @@ public class View_Game extends JFrame
 
     public void initGame()
     {
-        panDisks.add(new JLabel("Test"));
-
         // Utilisé une fois pour charger les disques
         game.getDisks().forEach(disk -> {
             PanDisk d = new PanDisk(disk);
+            listPanDisks.add(d);
             panDisks.add(d);
         });
 
         // Utilisé une fois pour charger les gameboards
         game.getPlayers().forEach(player -> {
             PanGameboard gb = new PanGameboard(player.getGameboard());
-            listBtnsGameboards.add(gb.listRowsBtns);
-            gb.setBorder(BorderFactory.createLineBorder(Color.black));
+            //gb.setBorder(BorderFactory.createLineBorder(Color.black));
+            listPanGameboards.put(player, gb);
             panGameboards.add(gb);
         });
 //        gb.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -69,14 +67,29 @@ public class View_Game extends JFrame
         pack();
     }
 
-    public void drawDisks()
+    public ArrayList<PanDisk> getListPanDisks()
     {
-        listPanDisks.forEach(PanDisk::drawDisk);
+        return listPanDisks;
     }
 
-    public void drawDisk(int index)
+    public ArrayList<PanGameboard> getListPanGameboards()
     {
-        listPanDisks.get(index).drawDisk();
+        return new ArrayList<>(listPanGameboards.values());
+    }
+
+    public void setDisksEnabled(boolean state)
+    {
+        listPanDisks.forEach(panDisk -> panDisk.getListBtnTiles().forEach(btn -> btn.setEnabled(state)));
+    }
+
+    public void setGameboardsEnabled(boolean state)
+    {
+        listPanGameboards.values().forEach(panGb -> panGb.setGameboardEnabled(state));
+    }
+
+    public PanGameboard getPlayerGameboard(Player player)
+    {
+        return listPanGameboards.get(player);
     }
 
     private Color getTileColor(TileType type)
@@ -103,16 +116,14 @@ public class View_Game extends JFrame
     /**
      * JPanel illustrant un seul disk
      */
-    private class PanDisk extends JPanel
+    public class PanDisk extends JPanel
     {
         private final Disk disk;
-        private final ArrayList<JButton> listTilesBtns = new ArrayList<>(); // On garde les boutons pour faire les events
+        private final ArrayList<BtnTile> listBtnTiles = new ArrayList<>(); // On garde les boutons pour faire les events
 
-        public PanDisk(Disk disk)
+        private PanDisk(Disk disk)
         {
             this.disk = disk;
-            listBtnsDisks.add(listTilesBtns);
-            listPanDisks.add(this);
 
             setLayout(new GridLayout(2,2));
 
@@ -125,29 +136,69 @@ public class View_Game extends JFrame
 
             disk.getTiles().forEach(tile ->
             {
-                JButton t = new JButton(tile.getType().toString());
-                t.setMargin(new Insets(1,1,1,1));
-                t.setPreferredSize(dimTile);
-                t.setBackground(getTileColor(tile.getType()));
-                listTilesBtns.add(t);
+                BtnTile t = new BtnTile(tile);
+                t.setEnabled(false);
+                listBtnTiles.add(t);
                 add(t);
             });
         }
+
+        public ArrayList<BtnTile> getListBtnTiles()
+        {
+            return listBtnTiles;
+        }
+
+        public Disk getDisk()
+        {
+            return disk;
+        }
+
+        public void removeTileType(TileType type)
+        {
+            ArrayList<BtnTile> btnTilesASuppr = new ArrayList<>();
+            listBtnTiles.forEach(btnTile -> {
+                if(btnTile.getTile().getType() == type)
+                    btnTilesASuppr.add(btnTile);
+            });
+            btnTilesASuppr.forEach(btnTile -> {
+                listBtnTiles.remove(btnTile);
+                remove(btnTile);
+            });
+        }
+
+
+        public class BtnTile extends JButton
+        {
+            private final Tile tile;
+
+            private BtnTile(Tile tile)
+            {
+                super(tile.getType().toString());
+                this.tile = tile;
+
+                setMargin(new Insets(1,1,1,1));
+                setPreferredSize(dimTile);
+                setBackground(getTileColor(tile.getType()));
+            }
+
+            public Tile getTile()
+            {
+                return tile;
+            }
+        }
     }
 
-    private class PanGameboard extends JPanel
+    public class PanGameboard extends JPanel
     {
         private final Gameboard gb;
         private final JPanel panStock;
         private final JPanel panBtns;
         private final JPanel panWall;
-        private final ArrayList<JButton> listRowsBtns = new ArrayList<>();
+        private final ArrayList<BtnRow> listRowsBtns = new ArrayList<>();
 
-        public PanGameboard(Gameboard gb)
+        private PanGameboard(Gameboard gb)
         {
             this.gb = gb;
-            listBtnsGameboards.add(listRowsBtns);
-            listPanGameboard.add(this);
 
             panStock = new JPanel();
             panBtns = new JPanel();
@@ -222,10 +273,44 @@ public class View_Game extends JFrame
             panBtns.setLayout(new GridLayout(5,1));
             for(int i = 0; i < 5; ++i)
             {
-                JButton btn = new JButton();
-                btn.setPreferredSize(dimTile);
-                panBtns.add(btn);
+                BtnRow btn = new BtnRow(i);
+                btn.setEnabled(false);
                 listRowsBtns.add(btn);
+                panBtns.add(btn);
+            }
+        }
+
+        public ArrayList<BtnRow> getListRowsBtns()
+        {
+            return listRowsBtns;
+        }
+
+        public Gameboard getGameboard()
+        {
+            return gb;
+        }
+
+        public void setGameboardEnabled(boolean state)
+        {
+            listRowsBtns.forEach(btn -> btn.setEnabled(state));
+        }
+
+
+        public class BtnRow extends JButton
+        {
+            private final int row;
+
+            private BtnRow(int row)
+            {
+                super();
+                this.row = row;
+
+                setPreferredSize(dimTile);
+            }
+
+            public int getRow()
+            {
+                return row;
             }
         }
     }

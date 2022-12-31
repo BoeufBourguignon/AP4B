@@ -64,7 +64,7 @@ public class Game {
 
     public Player getFirstPlayer()
     {
-        Player firstPlayer = null;
+        Player firstPlayer = players.get(0);
 
         int i = 0;
         while(i < players.size() - 1 && !players.get(i).isFirstPlayer())

@@ -41,9 +41,9 @@ public class Center extends Disk {
      * @param tile : le type de tile qu'on cherche
      * @return la liste de toutes les tiles du type recherché
      */
-    public List<Tile> find(TileType tile){
+    public ArrayList<Tile> find(TileType tile){
 
-        List<Tile> liste_retournee = new ArrayList<>();
+        ArrayList<Tile> liste_retournee = new ArrayList<>();
 
         for(int i = 0; i< liste_tiles_centre.size();i++) {
 

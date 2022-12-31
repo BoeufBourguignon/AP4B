@@ -13,16 +13,18 @@ public class Disk {
             disk = new ArrayList<>();
         }
 
-        public List<Tile> find (TileType type)
+        public ArrayList<Tile> find (TileType type)
         {
-            List<Tile> TypeOndisk = null;
+            ArrayList<Tile> TypeOndisk = new ArrayList<>();
             for (int i=0; i<disk.size(); i++)
             {
                 if (disk.get(i).getType()==type)
                 {
-                    TypeOndisk.add(disk.get(i));
+                    Tile tileFound = disk.get(i);
+                    TypeOndisk.add(tileFound);
                 }
             }
+            TypeOndisk.forEach(tile -> disk.remove(tile));
             return TypeOndisk;
         }
 
