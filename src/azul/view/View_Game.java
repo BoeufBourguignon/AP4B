@@ -72,9 +72,10 @@ public class View_Game extends JFrame
         return listPanDisks;
     }
 
-    public ArrayList<PanGameboard> getListPanGameboards()
+    public HashMap<Player, PanGameboard> getListPanGameboards()
     {
-        return new ArrayList<>(listPanGameboards.values());
+        //return new ArrayList<>(listPanGameboards.values());
+        return listPanGameboards;
     }
 
     public void setDisksEnabled(boolean state)
@@ -87,9 +88,9 @@ public class View_Game extends JFrame
         listPanGameboards.values().forEach(panGb -> panGb.setGameboardEnabled(state));
     }
 
-    public PanGameboard getPlayerGameboard(Player player)
+    public Map.Entry<Player, PanGameboard> getPlayerGameboard(Player player)
     {
-        return listPanGameboards.get(player);
+        return new AbstractMap.SimpleEntry<>(player, listPanGameboards.get(player));
     }
 
     private Color getTileColor(TileType type)
@@ -223,12 +224,17 @@ public class View_Game extends JFrame
             panStock.setLayout(new GridLayout(5, 1));
             for(int i = 0; i < 5; ++i)
             {
+                // Pour dessiner les lignes il faut y aller à l'envers
                 for(int j = 0; j < 5; j++)
                 {
                     JPanel panTileTmp = new JPanel();
                     panTileTmp.setPreferredSize(dimTile);
                     if(j >= 4 - i)
-                        panTileTmp.setBackground(getTileColor(stock.get(i).get((i + j) % 4).getType()));
+                        panTileTmp.setBackground(getTileColor(
+                                stock.get(i).size() > i - (i + j) % 4
+                                        ? stock.get(i).get(i - (i + j) % 4).getType()
+                                        : TileType.Empty
+                        ));
                     panStock.add(panTileTmp);
                 }
             }
@@ -252,11 +258,11 @@ public class View_Game extends JFrame
                         //Devinons le type attendu selon les coordonnées
                         switch ((5 + (i - j)) % 5)
                         {
-                            case 0 -> panTileTmp.setBackground(new Color(200, 200, 255));
-                            case 1 -> panTileTmp.setBackground(new Color(255, 255, 200));
-                            case 2 -> panTileTmp.setBackground(new Color(255, 200, 255));
-                            case 3 -> panTileTmp.setBackground(new Color(255, 243, 200));
-                            case 4 -> panTileTmp.setBackground(new Color(200, 255, 200));
+                            case 0 -> panTileTmp.setBackground(new Color(200, 200, 255)); // AP
+                            case 1 -> panTileTmp.setBackground(new Color(255, 255, 200)); // IS
+                            case 2 -> panTileTmp.setBackground(new Color(255, 200, 255)); // N
+                            case 3 -> panTileTmp.setBackground(new Color(255, 243, 200)); // TCS
+                            case 4 -> panTileTmp.setBackground(new Color(200, 255, 200)); // HS
                         }
                     }
                     else

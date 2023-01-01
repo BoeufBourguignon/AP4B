@@ -34,25 +34,24 @@ public class Player
         return this.gameboard;
     }
 
-    public List<Tile> pickTiles(Disk disk, TileType tileType)
-            throws Exception
+    public ArrayList<Tile> pickTiles(Disk disk, TileType tileType)
     {
         // Pioche les tuiles
-        List<Tile> pickedTiles = disk.find(tileType);
+        ArrayList<Tile> pickedTiles = disk.find(tileType);
 
         // Vérifie que des tuiles ont été piochées
-        if(pickedTiles.size() == 0)
-            throw new Exception("Aucune tuile n'a été piochée");
-
-        // Vérifie si la tuile de premier joueur a été piochée
-        int i = 0;
-        while(i < pickedTiles.size() - 1 || pickedTiles.get(i).getType() != TileType.First) {
-            i++;
-        }
-        if(pickedTiles.get(i).getType() == TileType.First) {
-            // Si la tuile First est présente dans la liste, on l'enlève et on met le Player premier joueur
-            pickedTiles.remove(i);
-            this.isFirstPlayer = true;
+        if(pickedTiles.size() != 0)
+        {
+            // Vérifie si la tuile de premier joueur a été piochée
+            int i = 0;
+            while(i < pickedTiles.size() - 1 && pickedTiles.get(i).getType() != TileType.First) {
+                i++;
+            }
+            if(pickedTiles.get(i).getType() == TileType.First) {
+                // Si la tuile First est présente dans la liste, on l'enlève et on met le Player premier joueur
+                pickedTiles.remove(i);
+                this.isFirstPlayer = true;
+            }
         }
 
         return pickedTiles;

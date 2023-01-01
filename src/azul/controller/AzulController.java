@@ -4,13 +4,13 @@ import azul.model.*;
 import azul.view.*;
 
 import javax.swing.*;
-import java.util.ArrayList;
+import java.util.*;
 
 public class AzulController
 {
     private final Game game;
     private JFrame window;
-    private View_Game.PanGameboard currentGameboard;
+    private Map.Entry<Player, View_Game.PanGameboard> currentPlayerAndGameboard;
     private ArrayList<Tile> selectedTiles = null;
 
     public AzulController()
@@ -49,16 +49,16 @@ public class AzulController
             );
 
             // On met les évènements sur les boutons des gamboards
-            V_Game.getListPanGameboards().forEach(panGb ->
+            V_Game.getListPanGameboards().forEach((player, panGb) ->
                     panGb.getListRowsBtns().forEach(btn     ->
-                            btn.addActionListener(e -> stockTiles(panGb, btn.getRow())
+                            btn.addActionListener(e -> stockTiles(panGb, player, btn.getRow())
                             )
                     )
 
             );
 
             // On indique le premier joueur
-            currentGameboard = V_Game.getPlayerGameboard(game.getFirstPlayer());
+            currentPlayerAndGameboard = V_Game.getPlayerGameboard(game.getFirstPlayer());
 
             // Et on l'autorise à jouer
             V_Game.setDisksEnabled(true);
@@ -91,25 +91,36 @@ public class AzulController
     {
         if(selectedTiles == null)
         {
-            selectedTiles = panDisk.getDisk().find(type);
+            selectedTiles = currentPlayerAndGameboard.getKey().pickTiles(panDisk.getDisk(), type);
             panDisk.removeTileType(type);
             window.validate();
 
             // Le joueur doit ensuite choisir où les placer, donc on débloque son plateau
             // (et au cas ou on bloque tous les autres)
             ((View_Game) window).setGameboardsEnabled(false);
-            currentGameboard.setGameboardEnabled(true);
+            currentPlayerAndGameboard.getValue().setGameboardEnabled(true);
             // et on bloque les disques
             ((View_Game) window).setDisksEnabled(false);
         }
     }
 
-    private void stockTiles(View_Game.PanGameboard gb, int row)
+    private void stockTiles(View_Game.PanGameboard gb, Player player, int row)
     {
         if(selectedTiles.size() > 0)
         {
             // On stock les tuiles selectionnées
-            gb.getGameboard().fillStockline(row, selectedTiles);
+            try
+            {
+                System.out.println(gb.getGameboard().fillStockline(row, selectedTiles));
+            }
+            catch(Exception ex)
+            {
+                JOptionPane.showMessageDialog(window,
+                        ex.getMessage(),
+                        "Erreur",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
             // On n'a plus besoin de la liste de tuiles sélectionnées
             selectedTiles = null;
             // On recharge la vue du stock du gameboard

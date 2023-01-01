@@ -7,6 +7,11 @@ public class Gameboard {
     //-----Attributs-----
 
 
+    // Pour le stock ça sert à rien de stocker des tuiles vides
+    //  On peut connaitre la taille de chaque ligne du stock en faisant index ligne + 1
+
+    // Le mur de référence on peut aussi s'en passer, on peut "calculer" le type de la tuile attendu avec les coordonnées
+
     private int score;        //  le score du joueur
     private ArrayList<ArrayList<Tile>>  wall;  // le mur du joueur
     private ArrayList<Tile> malus;    // zone malus
@@ -40,18 +45,24 @@ public class Gameboard {
         //-----création de la "matrice" stock-----
         this.stock = new ArrayList<>();
 
-        Tile t_stock = new Tile(TileType.Empty); //On créé une Tile de type "vide" pour pouvoir remplir le wall au début
+        stock.add(new ArrayList<>());
+        stock.add(new ArrayList<>());
+        stock.add(new ArrayList<>());
+        stock.add(new ArrayList<>());
+        stock.add(new ArrayList<>());
 
-        ArrayList<Tile> ligne1_stock = new ArrayList<>(List.of(t_stock));
-        stock.add(ligne1_stock);
-        ArrayList<Tile> ligne2_stock = new ArrayList<>(List.of(t_stock,t_stock));
-        stock.add(ligne2_stock);
-        ArrayList<Tile> ligne3_stock = new ArrayList<>(List.of(t_stock,t_stock,t_stock));
-        stock.add(ligne3_stock);
-        ArrayList<Tile> ligne4_stock = new ArrayList<>(List.of(t_stock,t_stock,t_stock,t_stock));
-        stock.add(ligne4_stock);
-        ArrayList<Tile> ligne5_stock = new ArrayList<>(List.of(t_stock,t_stock,t_stock,t_stock,t_stock));
-        stock.add(ligne5_stock);
+//        Tile t_stock = new Tile(TileType.Empty); //On créé une Tile de type "vide" pour pouvoir remplir le wall au début
+
+//        ArrayList<Tile> ligne1_stock = new ArrayList<>(List.of(t_stock));
+//        stock.add(ligne1_stock);
+//        ArrayList<Tile> ligne2_stock = new ArrayList<>(List.of(t_stock,t_stock));
+//        stock.add(ligne2_stock);
+//        ArrayList<Tile> ligne3_stock = new ArrayList<>(List.of(t_stock,t_stock,t_stock));
+//        stock.add(ligne3_stock);
+//        ArrayList<Tile> ligne4_stock = new ArrayList<>(List.of(t_stock,t_stock,t_stock,t_stock));
+//        stock.add(ligne4_stock);
+//        ArrayList<Tile> ligne5_stock = new ArrayList<>(List.of(t_stock,t_stock,t_stock,t_stock,t_stock));
+//        stock.add(ligne5_stock);
 
         //-----
 
@@ -134,47 +145,62 @@ public class Gameboard {
      * @param tiles : la liste de Tile que l'on veut insérer dans le stock
      * @return : "False" si échec de placement à cette ligne, sinon "True"
      */
-    public boolean fillStockline(int stockLine, List<Tile> tiles) { // 0 à 4 //fonctionne!
+    public boolean fillStockline(int stockLine, ArrayList<Tile> tiles)
+            throws Exception
+    { // 0 à 4 //fonctionne!
 
-        TileType type = tiles.get(0).getType(); //récupération du type des tile de la liste "tiles"
-        int longueur = tiles.size(); //longueur de la liste de tile
+        TileType type = tiles.get(0).getType();
+        boolean canBeStocked = true;
 
-        //check si on rentre avec la tile "first"
+        if(tiles.size() != 0)
+        {
 
-        if(type == TileType.First){
-            malus.remove(0);
-            malus.add(0,tiles.get(0)); // on ajoute la tile "First" au début du malus
-            return false;
+            //check si on rentre avec la tile "first"
+            // On check dans toute la liste. On arrête d'itérer dès la première instance de tuile type first
+            int i = 0;
+            while (i < tiles.size() - 1 && tiles.get(i).getType() != TileType.First)
+            {
+                i++;
+            }
+            if (tiles.get(i).getType() == TileType.First)
+            {
+                // Si tuile premier joueur, c'est pas normal
+                throw new Exception("La tuile de premier joueur ne devrait pas se trouver là");
+
+            }
+
+            //check disponibilité de la ligne stockLine:
+            // Ligne dispo si :
+            //  wall pas déjà rempli avec cette couleur ET vide OU (reste de la place ET tuiles du même type)
+
+            // Determinons la position de la tile sur le wall, avec son type et la ligne
+
+
+            if(stock.get(stockLine).size() == 0 || (stock.get(stockLine).size() < stockLine + 1 && stock.get(stockLine).get(0).getType() == type))
+            {
+                // La ligne peut être stockée
+                // Il faut stocker ce que l'on peut
+                // Puis envoyer le reste en malus
+                tiles.forEach(tile -> {
+                    // Si il reste de la place dans le stock
+                    if(stock.get(stockLine).size() < stockLine + 1)
+                    {
+                        stock.get(stockLine).add(tile);
+                    }
+                    else
+                    {
+                        malus.add(tile);
+                    }
+                });
+
+            }
+            else
+            {
+                canBeStocked = false;
+            }
         }
 
-        //check disponibilité de la ligne stockLine:
-        if (wall.get(stockLine).contains(type) || (stock.get(stockLine).get(0).getType() != type && stock.get(stockLine).get(0).getType() != TileType.Empty )   ) { //vérifie si le mur contient déjà une tile du même type sur la ligne "stockline" OU si la ligne du stock  contient déjà  un autre type
-
-           return false; //échec de l'ajout dans la ligne souhaité
-        }
-
-        //cas où la liste est trop longue par rapport à la ligne dans le stock
-        int compteur_indice_malus = 1; // on commence à 1 pour liasser la 1ère case vide pour a tile "First"
-        while (longueur > stockLine + 1) {
-
-            malus.remove(compteur_indice_malus);
-            malus.add(0,tiles.get(0));
-            tiles.remove(0);
-            longueur -=1;
-        }
-
-        //on rajotue le retse dans le stock
-        int compteur_ligne_stock = 0;
-        while(longueur != 0){
-
-            stock.get(stockLine).remove(compteur_ligne_stock); // on retire la tile vide
-            stock.get(stockLine).add(0,tiles.get(0)); // on rempli avec la nouvelle tile
-            tiles.remove(0); // on retire l'élément que l'on vient d'ajouter
-            longueur -=1;
-            compteur_ligne_stock++;
-        }
-
-        return true; // ajout dans le stock réussi
+        return canBeStocked; // ajout dans le stock réussi
     }
 
     /**
