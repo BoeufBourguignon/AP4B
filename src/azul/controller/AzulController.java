@@ -59,6 +59,7 @@ public class AzulController
 
             // On indique le premier joueur
             currentPlayerAndGameboard = V_Game.getPlayerGameboard(game.getFirstPlayer());
+            currentPlayerAndGameboard.getValue().setPlaying(true);
 
             // Et on l'autorise à jouer
             V_Game.setDisksEnabled(true);

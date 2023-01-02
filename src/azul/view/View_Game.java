@@ -127,6 +127,7 @@ public class View_Game extends JFrame
             this.disk = disk;
 
             setLayout(new GridLayout(2,2));
+            setBackground(new Color(255, 220, 177));
 
             drawDisk();
         }
@@ -205,6 +206,8 @@ public class View_Game extends JFrame
             panBtns = new JPanel();
             panWall = new JPanel();
 
+            panStock.setOpaque(false);
+
             //setLayout(new GridLayout(1,3));
 
             add(panStock);
@@ -230,11 +233,17 @@ public class View_Game extends JFrame
                     JPanel panTileTmp = new JPanel();
                     panTileTmp.setPreferredSize(dimTile);
                     if(j >= 4 - i)
+                    {
                         panTileTmp.setBackground(getTileColor(
                                 stock.get(i).size() > i - (i + j) % 4
-                                        ? stock.get(i).get(i - (i + j) % 4).getType()
-                                        : TileType.Empty
+                                ? stock.get(i).get(i - (i + j) % 4).getType()
+                                : TileType.Empty
                         ));
+                    }
+                    else
+                    {
+                        panTileTmp.setOpaque(false);
+                    }
                     panStock.add(panTileTmp);
                 }
             }
@@ -299,6 +308,11 @@ public class View_Game extends JFrame
         public void setGameboardEnabled(boolean state)
         {
             listRowsBtns.forEach(btn -> btn.setEnabled(state));
+        }
+
+        public void setPlaying(boolean isPlaying)
+        {
+            setBackground(isPlaying ? new Color(200, 255, 200) : null);
         }
 
 
