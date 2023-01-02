@@ -1,5 +1,3 @@
-package azul.model;
-
 import java.util.*;
 
 public class Gameboard {
@@ -19,6 +17,8 @@ public class Gameboard {
 
     //mur de "référence", pour savoir comment doivent être disposé les tiles sur le mur final
     private ArrayList<ArrayList<TileType>>  reference_wall;
+
+    private int compteur_lignes_completes;
 
 
     //-----Méthodes-----
@@ -108,6 +108,10 @@ public class Gameboard {
      */
     public ArrayList<ArrayList<Tile>>getWall() { // fonctionne!
         return wall;
+    }
+
+    public int getCompteur_lignes_completes() {
+        return compteur_lignes_completes;
     }
 
     /**
@@ -267,5 +271,92 @@ public class Gameboard {
             taille_ligne+=1; // la ligne suivante contient 1 élément en +
         }
     }
+
+
+
+    public boolean checkLignePleine(int ligne){ // check si une ligne est pleine
+
+
+        if( (this.wall.get(ligne).get(0).getType() != TileType.Empty)&& (this.wall.get(ligne).get(1).getType() != TileType.Empty) &&(this.wall.get(ligne).get(2).getType() != TileType.Empty) && (this.wall.get(ligne).get(3).getType() != TileType.Empty) && (this.wall.get(ligne).get(4).getType() != TileType.Empty) ){
+
+            return true;
+        }
+
+        return false;
+    }
+    public boolean checkColonnePleine(int colonne){ // check si une ligne est pleine
+
+        int compteur_colonne = 1;
+        for(int i = 0 ;i < 5;i++){
+
+
+            if( (this.wall.get(i).get(colonne).getType()  != TileType.Empty) ) {
+
+                compteur_colonne++;
+            }
+            else{
+                colonne ++;
+                compteur_colonne = 1;
+            }
+
+        }
+
+        if (compteur_colonne == 5){ //colonne pleine ?
+
+            return true;
+        }
+        return false;
+
+    }
+
+    public void computeScore(){
+
+
+        for(int ligne = 0;ligne<5;ligne++){
+            if(checkLignePleine(ligne)){
+                this.compteur_lignes_completes ++;
+
+                if(this.compteur_lignes_completes<2){
+                    this.score +=5;
+                }else{
+                    this.score+=2;
+                }
+
+            }
+        }
+
+        for(int colonne = 0;colonne <5; colonne++){
+
+            if (checkColonnePleine(colonne) ){
+                this.score+=7;
+            }
+        }
+
+        //on teste si chaque tile est présente 5fois dans le mur, si oui on ajoute 10 au score, sinon on fait rien
+        if( Collections.frequency(this.wall,TileType.TCS) == 5){
+
+            this.score +=10;
+        }
+
+        if( Collections.frequency(this.wall,TileType.AP) == 5){
+
+            this.score +=10;
+        }
+
+        if( Collections.frequency(this.wall,TileType.N) == 5){
+
+            this.score +=10;
+        }
+
+        if( Collections.frequency(this.wall,TileType.IS) == 5){
+
+            this.score +=10;
+        }
+
+        if( Collections.frequency(this.wall,TileType.HS) == 5){
+
+            this.score +=10;
+        }
+
+    }
 }
-	
