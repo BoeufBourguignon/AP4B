@@ -10,16 +10,18 @@ public class View_Game extends JFrame
 {
     private final int tileSize = 50;
     private final Dimension dimTile = new Dimension(tileSize, tileSize);
+    private final GridBagConstraints c = new GridBagConstraints();
     private final Game game;
 
     // Gameboards
     private final JPanel panGameboards;
-    private HashMap<Player, PanGameboard> listPanGameboards = new HashMap<>();
+    private final HashMap<Player, PanGameboard> listPanGameboards = new HashMap<>();
 
 
     // Disks
     private final JPanel panDisks; // Panneau d'affichage des disks
-    private ArrayList<PanDisk> listPanDisks = new ArrayList<>();
+    private final ArrayList<PanDisk> listPanDisks = new ArrayList<>();
+    private PanDisk panCenter;
 
 
     public View_Game(Game game)
@@ -28,41 +30,62 @@ public class View_Game extends JFrame
 
         this.game = game;
 
-        JPanel container = new JPanel();
-        JScrollPane scrl = new JScrollPane(container);
-        add(scrl);
-
-        container.setLayout(new GridLayout(2,1));
+        setLayout(new GridLayout(2,1));
 
         // Partie supérieure : Les disques
         panDisks = new JPanel();
-        container.add(panDisks);
+        add(panDisks);
 
         // Partie inférieure : Les gameboards
         panGameboards = new JPanel();
-        container.add(panGameboards);
+        add(panGameboards);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public void initGame()
     {
-        // Utilisé une fois pour charger les disques
+        // Partie supérieure : Disques
+        // Un panel avec text et disques, un autre panel avec text et centre
+
+        // Disks
+        //   Disks
+        JPanel panDisks_BagDisks = new JPanel();
+        panDisks_BagDisks.setLayout(new GridBagLayout());
+
+        c.gridy = 0; c.gridx = 0;
+        panDisks_BagDisks.add(new JLabel("Disques", JLabel.CENTER), c);
+        c.gridy = 1; c.gridx = 0;
+        JPanel panDisks_Disks = new JPanel();
+        panDisks_BagDisks.add(panDisks_Disks, c);
         game.getDisks().forEach(disk -> {
             PanDisk d = new PanDisk(disk);
             listPanDisks.add(d);
-            panDisks.add(d);
+            panDisks_Disks.add(d);
         });
 
-        // Utilisé une fois pour charger les gameboards
+        panDisks.add(panDisks_BagDisks);
+
+        //  Centre
+        JPanel panDisks_BagCenter = new JPanel();
+        panDisks_BagCenter.setLayout(new GridBagLayout());
+
+        c.gridy = 0; c.gridx = 0;
+        panDisks_BagCenter.add(new JLabel("Centre", JLabel.CENTER), c);
+        c.gridy = 1; c.gridx = 0;
+        panCenter = new PanDisk(game.getCenter());
+        panDisks_BagCenter.add(panCenter, c);
+        listPanDisks.add(panCenter);
+
+        panDisks.add(panDisks_BagCenter);
+
+
+        // Partie inférieure : Gameboards
         game.getPlayers().forEach(player -> {
-            PanGameboard gb = new PanGameboard(player.getGameboard());
-            //gb.setBorder(BorderFactory.createLineBorder(Color.black));
+            PanGameboard gb = new PanGameboard(player);
             listPanGameboards.put(player, gb);
             panGameboards.add(gb);
         });
-//        gb.setBorder(BorderFactory.createLineBorder(Color.black));
-//        gb.add(new JLabel("TEST"));
 
         pack();
     }
@@ -70,6 +93,11 @@ public class View_Game extends JFrame
     public ArrayList<PanDisk> getListPanDisks()
     {
         return listPanDisks;
+    }
+
+    public PanDisk getCenterPanDisk()
+    {
+        return panCenter;
     }
 
     public HashMap<Player, PanGameboard> getListPanGameboards()
@@ -81,6 +109,7 @@ public class View_Game extends JFrame
     public void setDisksEnabled(boolean state)
     {
         listPanDisks.forEach(panDisk -> panDisk.getListBtnTiles().forEach(btn -> btn.setEnabled(state)));
+        panCenter.getListBtnTiles().forEach(btn -> btn.setEnabled(state));
     }
 
     public void setGameboardsEnabled(boolean state)
@@ -95,7 +124,7 @@ public class View_Game extends JFrame
 
     private Color getTileColor(TileType type)
     {
-        Color color = Color.GRAY;
+        Color color = Color.LIGHT_GRAY;
         switch(type)
         {
             case AP -> color = Color.BLUE;
@@ -103,6 +132,7 @@ public class View_Game extends JFrame
             case N -> color = Color.MAGENTA;
             case TCS -> color = Color.ORANGE;
             case HS -> color = Color.GREEN;
+            case First -> color = Color.RED;
         }
         return color;
     }
@@ -155,17 +185,33 @@ public class View_Game extends JFrame
             return disk;
         }
 
-        public void removeTileType(TileType type)
+        public void pickTiles(PanDisk panDisk, TileType type)
         {
-            ArrayList<BtnTile> btnTilesASuppr = new ArrayList<>();
+            // Si disk normal : on supprime les tiles du disk et on ajoute les autres au centre (que dans la liste)
+            // Si disk center : on supprime les tiles du disk
+
+            ArrayList<BtnTile> selectedBtnTiles = new ArrayList<>();
+            ArrayList<BtnTile> nonSelectedBtnTiles = new ArrayList<>();
+
             listBtnTiles.forEach(btnTile -> {
                 if(btnTile.getTile().getType() == type)
-                    btnTilesASuppr.add(btnTile);
+                    selectedBtnTiles.add(btnTile);
+                else if(!(panDisk.getDisk() instanceof Center))
+                    nonSelectedBtnTiles.add(btnTile);
             });
-            btnTilesASuppr.forEach(btnTile -> {
-                listBtnTiles.remove(btnTile);
-                remove(btnTile);
-            });
+
+            if(panDisk.getDisk() instanceof Center)
+            {
+                selectedBtnTiles.forEach(btnTile -> {
+                    remove(btnTile);
+                    listBtnTiles.remove(btnTile);
+                });
+            }
+            else
+            {
+                selectedBtnTiles.forEach(this::remove);
+                nonSelectedBtnTiles.forEach(this::remove);
+            }
         }
 
 
@@ -192,38 +238,59 @@ public class View_Game extends JFrame
 
     public class PanGameboard extends JPanel
     {
-        private final Gameboard gb;
+        private final Player player;
         private final JPanel panStock;
         private final JPanel panBtns;
         private final JPanel panWall;
+        private final JPanel panMalus;
         private final ArrayList<BtnRow> listRowsBtns = new ArrayList<>();
+        private final JButton btnMalus;
 
-        private PanGameboard(Gameboard gb)
+        private PanGameboard(Player p)
         {
-            this.gb = gb;
+            this.player = p;
 
             panStock = new JPanel();
             panBtns = new JPanel();
             panWall = new JPanel();
+            panMalus = new JPanel();
+
+            btnMalus = new JButton();
+            btnMalus.setPreferredSize(dimTile);
 
             panStock.setOpaque(false);
 
-            //setLayout(new GridLayout(1,3));
+            setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
+            setLayout(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
 
-            add(panStock);
-            add(panBtns);
-            add(panWall);
+            c.insets = new Insets(5, 5, 5, 5);
+
+            c.gridy = 0; c.gridx = 0; c.gridwidth = 3;
+            add(new JLabel(player.getNickname(), JLabel.CENTER), c);
+            c.gridy = 1; c.gridx = 0; c.gridwidth = 1;
+            add(panStock, c);
+            c.gridy = 1; c.gridx = 1;
+            add(panBtns, c);
+            c.gridy = 1; c.gridx = 2;
+            add(panWall, c);
+            c.gridy = 2; c.gridx = 0; c.gridwidth = 3;
+            JPanel panMalusGroup = new JPanel();
+            panMalusGroup.add(panMalus);
+            panMalusGroup.add(btnMalus);
+            add(panMalusGroup, c);
 
             drawStock();
             drawBtns();
             drawWall();
+            drawMalus();
         }
 
         public void drawStock()
         {
             panStock.removeAll();
 
-            ArrayList<ArrayList<Tile>> stock = gb.getStock();
+            ArrayList<ArrayList<Tile>> stock = player.getGameboard().getStock();
             panStock.setLayout(new GridLayout(5, 1));
             for(int i = 0; i < 5; ++i)
             {
@@ -235,8 +302,8 @@ public class View_Game extends JFrame
                     if(j >= 4 - i)
                     {
                         panTileTmp.setBackground(getTileColor(
-                                stock.get(i).size() > i - (i + j) % 4
-                                ? stock.get(i).get(i - (i + j) % 4).getType()
+                                stock.get(i).size() > 4 - j
+                                ? stock.get(i).get(4 - j).getType()
                                 : TileType.Empty
                         ));
                     }
@@ -253,7 +320,8 @@ public class View_Game extends JFrame
         {
             panWall.removeAll();
 
-            ArrayList<ArrayList<Tile>> wall = gb.getWall();
+            ArrayList<ArrayList<Tile>> wall = player.getGameboard().getWall();
+            panWall.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
             panWall.setLayout(new GridLayout(5, 5));
             for(int i = 0; i < 5; ++i)
             {
@@ -295,19 +363,56 @@ public class View_Game extends JFrame
             }
         }
 
+        public void drawMalus()
+        {
+            panMalus.removeAll();
+
+            panMalus.setLayout(new GridLayout(1, 7));
+
+            ArrayList<Tile> malus = player.getGameboard().getMalus();
+            for(int i = 0; i < 7; ++i)
+            {
+                JPanel t = new JPanel();
+                t.setLayout(new BorderLayout());
+                t.setPreferredSize(dimTile);
+                JLabel lbl = new JLabel();
+                lbl.setHorizontalAlignment(SwingConstants.CENTER);
+                t.add(lbl, BorderLayout.CENTER);
+                if(i < 2)
+                    lbl.setText("-1");
+                else if(i < 5)
+                    lbl.setText("-2");
+                else
+                    lbl.setText("-3");
+
+                if(i < malus.size())
+                {
+                    t.setBackground(getTileColor(malus.get(i).getType()));
+                }
+
+                panMalus.add(t);
+            }
+        }
+
         public ArrayList<BtnRow> getListRowsBtns()
         {
             return listRowsBtns;
         }
 
+        public JButton getBtnMalus()
+        {
+            return btnMalus;
+        }
+
         public Gameboard getGameboard()
         {
-            return gb;
+            return player.getGameboard();
         }
 
         public void setGameboardEnabled(boolean state)
         {
             listRowsBtns.forEach(btn -> btn.setEnabled(state));
+            btnMalus.setEnabled(state);
         }
 
         public void setPlaying(boolean isPlaying)

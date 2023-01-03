@@ -19,12 +19,23 @@ public class AzulController
 
         window = new View_Accueil();
 
-        ((View_Accueil) window).getBtnValider().addActionListener(e -> startGame());
+        ((View_Accueil) window).getBtnValider().addActionListener(e -> askFirstPlayer());
 
         window.setVisible(true);
     }
 
-    private void startGame()
+    private void askFirstPlayer()
+    {
+        if(((View_Accueil) window).verifyPseudos())
+        {
+            ((View_Accueil) window).loadPanAskPremierJoueur();
+
+            ((View_Accueil) window).getListeBtnsPremierJoueur()
+                    .forEach(btn -> btn.addActionListener(e -> startGame(btn.getText())));
+        }
+    }
+
+    private void startGame(String pseudoFirstPlayer)
     {
         // On vérifie les pseudos
         if(((View_Accueil) window).verifyPseudos())
@@ -32,7 +43,12 @@ public class AzulController
             window.dispose();
 
             // On crée les classes "Player" et on les ajoute au Game
-            ((View_Accueil) window).getPseudos().forEach(pseudo -> game.addPlayer(new Player(pseudo)));
+            ((View_Accueil) window).getPseudos().forEach(pseudo -> {
+                Player player = new Player(pseudo);
+                game.addPlayer(player);
+                if(pseudo.equals(pseudoFirstPlayer))
+                    game.setFirstPlayer(player);
+            });
 
             // On crée la fenêtre de jeu
             window = new View_Game(game);
@@ -51,22 +67,24 @@ public class AzulController
             // On met les évènements sur les boutons des gamboards
             V_Game.getListPanGameboards().forEach((player, panGb) ->
                     panGb.getListRowsBtns().forEach(btn     ->
-                            btn.addActionListener(e -> stockTiles(panGb, player, btn.getRow())
+                            btn.addActionListener(e -> stockTiles(panGb, btn.getRow())
                             )
                     )
+            );
 
+            // On met l'event sur le bouton de malus
+            V_Game.getListPanGameboards().forEach((player, panGb) ->
+                    panGb.getBtnMalus().addActionListener(e -> stockTiles(panGb, 5))
             );
 
             // On indique le premier joueur
             currentPlayerAndGameboard = V_Game.getPlayerGameboard(game.getFirstPlayer());
+            ((View_Game) window).getListPanGameboards().forEach((p, gb) -> gb.setPlaying(false));
             currentPlayerAndGameboard.getValue().setPlaying(true);
+            currentPlayerAndGameboard.getKey().setFirstPlayer(false);
 
             // Et on l'autorise à jouer
-            V_Game.setDisksEnabled(true);
-
-            //currentPlayerIndex = (currentPlayerIndex + 1) % nbPlayer;
-
-            // Events de view_game
+            setChoosingTilesPhase();
 
             window.setVisible(true);
         }
@@ -77,6 +95,7 @@ public class AzulController
         try
         {
             game.initGame();
+            ((View_Game) window).initGame();
         }
         catch(Exception ex)
         {
@@ -85,50 +104,77 @@ public class AzulController
                     "Erreur",
                     JOptionPane.ERROR_MESSAGE);
         }
-        ((View_Game) window).initGame();
+    }
+
+    public void nextPlayer()
+    {
+        int currentIndex = game.getPlayers().indexOf(currentPlayerAndGameboard.getKey());
+        currentIndex = (currentIndex + 1) % game.getPlayers().size();
+
+        currentPlayerAndGameboard = ((View_Game) window).getPlayerGameboard(game.getPlayers().get(currentIndex));
+        ((View_Game) window).getListPanGameboards().forEach((p, gb) -> gb.setPlaying(false));
+        currentPlayerAndGameboard.getValue().setPlaying(true);
+        currentPlayerAndGameboard.getKey().setFirstPlayer(false);
+    }
+
+    private void setChoosingTilesPhase()
+    {
+        // Desactive tous les gameboards
+        ((View_Game) window).setGameboardsEnabled(false);
+        // Active les disks
+        ((View_Game) window).setDisksEnabled(true);
+    }
+
+    private void setStockingTilePhase()
+    {
+        // Desactive les disks
+        ((View_Game) window).setDisksEnabled(false);
+        // Active le gameboard du joueur
+        currentPlayerAndGameboard.getValue().setGameboardEnabled(true);
     }
 
     private void chooseTiles(View_Game.PanDisk panDisk, TileType type)
     {
         if(selectedTiles == null)
         {
-            selectedTiles = currentPlayerAndGameboard.getKey().pickTiles(panDisk.getDisk(), type);
-            panDisk.removeTileType(type);
+            selectedTiles = game.playerPickTile(currentPlayerAndGameboard.getKey(), panDisk.getDisk(), type);
+
+
+            panDisk.pickTiles(panDisk, type);
+
+            ((View_Game) window).getCenterPanDisk().drawDisk();
+            ((View_Game) window).getCenterPanDisk().getListBtnTiles().forEach(btnTile ->
+                    btnTile.addActionListener(e ->
+                            chooseTiles(((View_Game)window).getCenterPanDisk(), btnTile.getTile().getType())
+                    )
+            );
+
             window.validate();
 
             // Le joueur doit ensuite choisir où les placer, donc on débloque son plateau
-            // (et au cas ou on bloque tous les autres)
-            ((View_Game) window).setGameboardsEnabled(false);
-            currentPlayerAndGameboard.getValue().setGameboardEnabled(true);
-            // et on bloque les disques
-            ((View_Game) window).setDisksEnabled(false);
+            setStockingTilePhase();
         }
     }
 
-    private void stockTiles(View_Game.PanGameboard gb, Player player, int row)
+    private void stockTiles(View_Game.PanGameboard gb, int row)
     {
-        if(selectedTiles.size() > 0)
+        if(selectedTiles != null)
         {
-            // On stock les tuiles selectionnées
-            try
-            {
-                System.out.println(gb.getGameboard().fillStockline(row, selectedTiles));
-            }
-            catch(Exception ex)
-            {
-                JOptionPane.showMessageDialog(window,
-                        ex.getMessage(),
-                        "Erreur",
-                        JOptionPane.ERROR_MESSAGE);
-            }
+            boolean isStocked = gb.getGameboard().fillStockline(row, selectedTiles);
 
-            // On n'a plus besoin de la liste de tuiles sélectionnées
-            selectedTiles = null;
-            // On recharge la vue du stock du gameboard
-            gb.drawStock();
-            window.validate();
+            if(isStocked)
+            {
+                // On n'a plus besoin de la liste de tuiles sélectionnées
+                selectedTiles = null;
+                // On recharge la vue du stock du gameboard et du malus
+                gb.drawStock();
+                gb.drawMalus();
+                window.validate();
 
-            // Fin du tour de ce joueur, on le fera dans une fonction "nextPlayer()"
+                // Fin du tour de ce joueur, on le fera dans une fonction "nextPlayer()"
+                nextPlayer();
+                setChoosingTilesPhase();
+            }
         }
     }
 }

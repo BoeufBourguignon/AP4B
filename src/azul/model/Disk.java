@@ -6,7 +6,7 @@ import static java.lang.Math.random;
 
 public class Disk {
         
-        private ArrayList<Tile> disk;
+        protected ArrayList<Tile> disk;
 
         public Disk()
         {
@@ -33,7 +33,7 @@ public class Disk {
             disk.add(tile);
         }
 
-        public List<Tile> getTiles()
+        public ArrayList<Tile> getTiles()
         {
             return disk;
         }

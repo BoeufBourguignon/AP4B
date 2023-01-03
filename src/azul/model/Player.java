@@ -48,8 +48,7 @@ public class Player
                 i++;
             }
             if(pickedTiles.get(i).getType() == TileType.First) {
-                // Si la tuile First est présente dans la liste, on l'enlève et on met le Player premier joueur
-                pickedTiles.remove(i);
+                // Si la tuile First est présente dans la liste, on met le Player premier joueur
                 this.isFirstPlayer = true;
             }
         }

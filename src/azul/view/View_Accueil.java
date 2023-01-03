@@ -9,6 +9,7 @@ public class View_Accueil extends JFrame
     JLabel lblVerifyPseudos;
     private final JButton btnValider = new JButton("Valider");
     private ArrayList<JTextField> listePseudos = new ArrayList<>();
+    private final ArrayList<JButton> listeBtnsPremierJoueur = new ArrayList<>();
 
     public View_Accueil()
     {
@@ -29,9 +30,21 @@ public class View_Accueil extends JFrame
         resize();
     }
 
+    public void loadPanAskPremierJoueur()
+    {
+        PanChoixPremierJoueur panChoixPremierJoueur = new PanChoixPremierJoueur(getPseudos());
+        setContentPane(panChoixPremierJoueur);
+        resize();
+    }
+
     public JButton getBtnValider()
     {
         return btnValider;
+    }
+
+    public ArrayList<JButton> getListeBtnsPremierJoueur()
+    {
+        return listeBtnsPremierJoueur;
     }
 
     public ArrayList<String> getPseudos()
@@ -49,42 +62,38 @@ public class View_Accueil extends JFrame
 
     public boolean verifyPseudos()
     {
-        boolean isVerified = false;
-        if(getContentPane() instanceof PanPseudosJoueurs)
+        boolean isVerified = true;
+        ArrayList<String> pseudos = getPseudos();
+        for(int i = 0; i < pseudos.size() -1; ++i)
         {
-            isVerified = true;
-            ArrayList<String> pseudos = getPseudos();
-            for(int i = 0; i < pseudos.size() -1; ++i)
-            {
-                String pseudoToCompare = pseudos.get(i);
+            String pseudoToCompare = pseudos.get(i);
 
-                // Pseudo vide ?
-                if(pseudoToCompare.length() == 0)
+            // Pseudo vide ?
+            if(pseudoToCompare.length() == 0)
+            {
+                isVerified = false;
+                break;
+            }
+
+            // Pseudos identiques ?
+            for(int j = i + 1; j < pseudos.size(); ++j)
+            {
+                if (pseudoToCompare.equals(pseudos.get(j)))
                 {
                     isVerified = false;
                     break;
                 }
-
-                // Pseudos identiques ?
-                for(int j = i + 1; j < pseudos.size(); ++j)
-                {
-                    if (pseudoToCompare.equals(pseudos.get(j)))
-                    {
-                        isVerified = false;
-                        break;
-                    }
-                }
             }
-            // Montre ou cache le message d'alerte
-            lblVerifyPseudos.setVisible(!isVerified);
         }
+        // Montre ou cache le message d'alerte
+        lblVerifyPseudos.setVisible(!isVerified);
         return isVerified;
     }
 
     private class PanNbJoueurs extends JPanel
     {
 
-        public PanNbJoueurs()
+        private PanNbJoueurs()
         {
             setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
@@ -109,7 +118,7 @@ public class View_Accueil extends JFrame
 
     private class PanPseudosJoueurs extends JPanel
     {
-        public PanPseudosJoueurs(int nbJoueurs)
+        private PanPseudosJoueurs(int nbJoueurs)
         {
             listePseudos = new ArrayList<>();
 
@@ -147,6 +156,40 @@ public class View_Accueil extends JFrame
                 View_Accueil.this.setContentPane(new PanNbJoueurs());
                 View_Accueil.this.resize();
             });
+        }
+    }
+
+    private class PanChoixPremierJoueur extends JPanel
+    {
+        private PanChoixPremierJoueur(ArrayList<String> pseudos)
+        {
+            if(pseudos.size() != 0)
+            {
+                setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+
+                JPanel panLabelTitre = new JPanel();
+                panLabelTitre.add(new JLabel("Quel joueur est allé au portugal le plus récemment ?"));
+                add(panLabelTitre);
+
+                JPanel panBoutonsJoueurs = new JPanel();
+                pseudos.forEach(pseudo -> {
+                    JButton btnTmp = new JButton(pseudo);
+                    panBoutonsJoueurs.add(btnTmp);
+                    listeBtnsPremierJoueur.add(btnTmp);
+                });
+                add(panBoutonsJoueurs);
+
+                JPanel panBtns = new JPanel();
+                JButton btnRetour = new JButton("Retour");
+                panBtns.add(btnRetour);
+                add(panBtns);
+
+                btnRetour.addActionListener(e -> {
+                    View_Accueil.this.setContentPane(new PanPseudosJoueurs(pseudos.size()));
+                    View_Accueil.this.resize();
+                });
+
+            }
         }
     }
 }

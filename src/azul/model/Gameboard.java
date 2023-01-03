@@ -1,3 +1,5 @@
+package azul.model;
+
 import java.util.*;
 
 public class Gameboard {
@@ -70,10 +72,10 @@ public class Gameboard {
         //-----création du "tableau" malus-----
         this.malus = new ArrayList<>();  //tableau de 7 cases
 
-        for (int i=0;i<7;i++){
-            Tile t_malus = new Tile(TileType.Empty); //On créé une Tile de type "vide" pour pouvoir remplir le malus au début
-            malus.add(t_malus);
-        }
+//        for (int i=0;i<7;i++){
+//            Tile t_malus = new Tile(TileType.Empty); //On créé une Tile de type "vide" pour pouvoir remplir le malus au début
+//            malus.add(t_malus);
+//        }
         //-----
 
         //-----création de la "matrice" de reference_wall-----
@@ -150,17 +152,14 @@ public class Gameboard {
      * @return : "False" si échec de placement à cette ligne, sinon "True"
      */
     public boolean fillStockline(int stockLine, ArrayList<Tile> tiles)
-            throws Exception
     { // 0 à 4 //fonctionne!
 
         TileType type = tiles.get(0).getType();
         boolean canBeStocked = true;
 
-        if(tiles.size() != 0)
+        if(tiles.size() > 0)
         {
-
-            //check si on rentre avec la tile "first"
-            // On check dans toute la liste. On arrête d'itérer dès la première instance de tuile type first
+            // Cherche la tile First et la met en zone malus
             int i = 0;
             while (i < tiles.size() - 1 && tiles.get(i).getType() != TileType.First)
             {
@@ -168,39 +167,51 @@ public class Gameboard {
             }
             if (tiles.get(i).getType() == TileType.First)
             {
-                // Si tuile premier joueur, c'est pas normal
-                throw new Exception("La tuile de premier joueur ne devrait pas se trouver là");
-
+                // Si tuile premier joueur, on la met en zone malus
+                malus.add(0, tiles.get(i));
+                tiles.remove(tiles.get(i));
             }
 
-            //check disponibilité de la ligne stockLine:
-            // Ligne dispo si :
-            //  wall pas déjà rempli avec cette couleur ET vide OU (reste de la place ET tuiles du même type)
-
-            // Determinons la position de la tile sur le wall, avec son type et la ligne
-
-
-            if(stock.get(stockLine).size() == 0 || (stock.get(stockLine).size() < stockLine + 1 && stock.get(stockLine).get(0).getType() == type))
+            if(tiles.size() != 0)
             {
-                // La ligne peut être stockée
-                // Il faut stocker ce que l'on peut
-                // Puis envoyer le reste en malus
-                tiles.forEach(tile -> {
-                    // Si il reste de la place dans le stock
-                    if(stock.get(stockLine).size() < stockLine + 1)
+                if(stockLine == 5)
+                {
+                    // Stock dans la zone malus
+                    // !!! Normalement ce qui ne peut pas être socké dans la zone malus, va dans la défausse !!!
+                    malus.addAll(tiles);
+                }
+                else
+                {
+                    //check disponibilité de la ligne stockLine:
+                    // Ligne dispo si :
+                    //  wall pas déjà rempli avec cette couleur ET vide OU (reste de la place ET tuiles du même type)
+
+                    // Determinons la position de la tile sur le wall, avec son type et la ligne
+
+
+                    if(stock.get(stockLine).size() == 0 || (stock.get(stockLine).size() < stockLine + 1 && stock.get(stockLine).get(0).getType() == type))
                     {
-                        stock.get(stockLine).add(tile);
+                        // La ligne peut être stockée
+                        // Il faut stocker ce que l'on peut
+                        // Puis envoyer le reste en malus
+                        tiles.forEach(tile -> {
+                            // Si il reste de la place dans le stock
+                            if(stock.get(stockLine).size() <= stockLine)
+                            {
+                                stock.get(stockLine).add(tile);
+                            }
+                            else
+                            {
+                                malus.add(tile);
+                            }
+                        });
+
                     }
                     else
                     {
-                        malus.add(tile);
+                        canBeStocked = false;
                     }
-                });
-
-            }
-            else
-            {
-                canBeStocked = false;
+                }
             }
         }
 

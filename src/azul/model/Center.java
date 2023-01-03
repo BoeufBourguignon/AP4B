@@ -6,8 +6,6 @@ public class Center extends Disk {
 
     //-----Attributs-----
     private Tile FirstTile;
-    private ArrayList<Tile> liste_tiles_centre ;
-    //faire une liste de tiles
 
 
     //-----Méthodes-----
@@ -17,9 +15,9 @@ public class Center extends Disk {
      */
     public Center(){
 
-        this.FirstTile = new Tile(TileType.Empty);
-        this.liste_tiles_centre = new ArrayList<>();
-
+        super();
+        this.FirstTile = new Tile(TileType.First);
+        disk.add(0, FirstTile);
     }
 
     /**
@@ -30,28 +28,21 @@ public class Center extends Disk {
     }
 
     /**
-     * Déclaration de la liste "Liste_tiles_centre"
-     */
-    public void setListe_tiles_centre(ArrayList<Tile> tiles) {
-        this.liste_tiles_centre = tiles;
-    }
-
-    /**
      *
      * @param tile : le type de tile qu'on cherche
      * @return la liste de toutes les tiles du type recherché
      */
     public ArrayList<Tile> find(TileType tile){
 
-        ArrayList<Tile> liste_retournee = new ArrayList<>();
+        ArrayList<Tile> liste_retournee = super.find(tile);
 
-        for(int i = 0; i< liste_tiles_centre.size();i++) {
-
-            if (liste_tiles_centre.get(i).getType() == tile) {
-                liste_tiles_centre.remove(i);
-                liste_retournee.add(liste_tiles_centre.get(i)); // on ajoute l'élement à la liste retournée
-            }
+        if(FirstTile != null)
+        {
+            liste_retournee.add(FirstTile);
+            disk.remove(FirstTile);
+            FirstTile = null;
         }
+
         return liste_retournee;
     }
 }

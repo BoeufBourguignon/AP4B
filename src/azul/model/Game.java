@@ -8,6 +8,7 @@ public class Game {
     private Deck deck;
     private final ArrayList<Player> players;
     private ArrayList<Disk> disks;
+    private Center center;
 
     public Game()
     {
@@ -41,6 +42,8 @@ public class Game {
                 d.add(deck.drawTile());
             }
         }
+
+        center = new Center();
     }
 
     public void setNbPlayer(int nbPlayer) {
@@ -80,4 +83,25 @@ public class Game {
         return disks;
     }
 
+    public Center getCenter()
+    {
+        return center;
+    }
+
+    public ArrayList<Tile> playerPickTile(Player player, Disk disk, TileType type)
+    {
+        // Prend les tuiles
+        ArrayList<Tile> selected  = player.pickTiles(disk, type);
+
+        // Met les autres tuiles au centre si on est pas déjà au centre
+        // !!! mais du coup les events prennent toujours en compte les anciens disks, pas le centre !!!
+        if(!(disk instanceof Center))
+        {
+            ArrayList<Tile> diskTiles = disk.getTiles();
+            center.getTiles().addAll(diskTiles);
+            diskTiles.clear();
+        }
+
+        return selected;
+    }
 }
