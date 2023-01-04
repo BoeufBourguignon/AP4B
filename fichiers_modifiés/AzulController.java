@@ -233,7 +233,7 @@ public class AzulController
         boolean tout_les_disks_vides = false;
         int nb_disk_vides = 0;
 
-        List<Player> liste_gagnants = new ArrayList<>();
+        //List<Player> liste_gagnants = new ArrayList<>();
 
         for (int i = 0; i < disks.size(); i++) { //on regarde pour chaque disk s'il est vide
 
