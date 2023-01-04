@@ -4,12 +4,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
+
 public class View_Accueil extends JFrame
 {
     JLabel lblVerifyPseudos;
     private final JButton btnValider = new JButton("Valider");
     private ArrayList<JTextField> listePseudos = new ArrayList<>();
     private final ArrayList<JButton> listeBtnsPremierJoueur = new ArrayList<>();
+
+    Dimension tailleMoniteur = Toolkit.getDefaultToolkit().getScreenSize();
+    int longueur = tailleMoniteur.width;
+    int hauteur = tailleMoniteur.height;
 
     public View_Accueil()
     {
@@ -20,21 +25,25 @@ public class View_Accueil extends JFrame
 
         // D'abord on demande le nombre de joueurs
         setContentPane(new PanNbJoueurs());
-        resize();
+
+        setBounds(0,0,longueur,hauteur-25);
     }
 
     private void loadPanPseudos(int nbJoueurs)
     {
         PanPseudosJoueurs panPseudosJoueurs = new PanPseudosJoueurs(nbJoueurs);
         setContentPane(panPseudosJoueurs);
-        resize();
+
+        setBounds(0,0,longueur-1,hauteur-25);
+
     }
 
     public void loadPanAskPremierJoueur()
     {
         PanChoixPremierJoueur panChoixPremierJoueur = new PanChoixPremierJoueur(getPseudos());
         setContentPane(panChoixPremierJoueur);
-        resize();
+
+        setBounds(0,0,longueur-2,hauteur-25);
     }
 
     public JButton getBtnValider()
