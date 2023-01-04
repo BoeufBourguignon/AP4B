@@ -186,7 +186,7 @@ public class AzulController
 
         Discard discard_content = game.getDiscard();
 
-        for(int i = 0;i<4;i++){
+        for(int i = 0;i<joueurs.size();i++){
 
             Gameboard jeu = joueurs.get(i).getGameboard(); // on récup le gamebord du joueur
             unused_tiles = jeu.WallTilling(); // on remplit le tableau du joueur
@@ -200,7 +200,7 @@ public class AzulController
         List<Player> joueurs =  game.getPlayers(); //on récup les joueurs
         List<Player> gagnants = new ArrayList<>() ;
 
-        for(int i = 0;i<4;i++){
+        for(int i = 0;i<joueurs.size();i++){
 
             Gameboard jeu = joueurs.get(i).getGameboard(); // on récup le gameboard de chaque joueur
             for(int ligne = 0;ligne<5;ligne++) {
@@ -220,7 +220,7 @@ public class AzulController
 
         List<Player> joueurs =  game.getPlayers();
 
-        for(int i = 0;i<4;i++) {
+        for(int i = 0;i<joueurs.size();i++) {
 
             Gameboard jeu = joueurs.get(i).getGameboard(); // on récup le gameboard de chaque joueur
             jeu.computeScore(); // on calcule le score de chaque joueur
@@ -233,7 +233,7 @@ public class AzulController
         boolean tout_les_disks_vides = false;
         int nb_disk_vides = 0;
 
-        //List<Player> liste_gagnants = new ArrayList<>();
+        List<Player> liste_gagnants = new ArrayList<>();
 
         for (int i = 0; i < disks.size(); i++) { //on regarde pour chaque disk s'il est vide
 
