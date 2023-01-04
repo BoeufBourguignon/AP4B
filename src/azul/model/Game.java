@@ -6,6 +6,7 @@ public class Game {
     private int nbPlayer;
     private int nbDisk;
     private Deck deck;
+    private ArrayList<Tile> discard;
     private final ArrayList<Player> players;
     private ArrayList<Disk> disks;
     private Center center;
@@ -29,6 +30,9 @@ public class Game {
 
         // Instanciation du deck
         deck = new Deck();
+
+        // Instanciation du discard
+        discard = new ArrayList<>();
 
         // Instanciation des disks
         nbDisk = 2 * nbPlayer + 1;

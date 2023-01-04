@@ -243,8 +243,10 @@ public class Gameboard {
 
     /**
      * Fonction qui s'occupe de remplir le Wall à partir des lignes remplies de Tile ayant un type différent de "Empty"
+     *
+     * @return tuiles à jeter
      */
-    public void WallTilling(){  //fonctionne
+    public ArrayList<Tile> wallTilling(){  //fonctionne
 
         int taille_ligne = 1; // la première ligne contient qu'un élément
 
@@ -281,6 +283,38 @@ public class Gameboard {
             }
             taille_ligne+=1; // la ligne suivante contient 1 élément en +
         }
+
+        throw new UnsupportedOperationException();
+    }
+
+    public ArrayList<Tile> calculerMalus(Tile tileFirst)
+    {
+        ArrayList<Tile> tuilesAJeter;
+        switch(malus.size())
+        {
+            case 7:
+                score -= 3;
+            case 6:
+                score -= 3;
+            case 5:
+                score -= 2;
+            case 4:
+                score -= 2;
+            case 3:
+                score -= 2;
+            case 2:
+                score -= 1;
+            case 1:
+                score -= 1;
+        }
+        if(score < 0) score = 0;
+
+        malus.remove(tileFirst);
+
+        tuilesAJeter = new ArrayList<>(malus);
+        malus.clear();
+
+        return tuilesAJeter;
     }
 
 

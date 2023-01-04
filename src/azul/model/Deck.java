@@ -18,50 +18,6 @@ public class Deck {
             this.deck.add(new Tile(TileType.IS));
             this.deck.add(new Tile(TileType.HS));
         }
-
-        /*
-        //----- création de la "liste" deck contenant 4 Tiles
-        this.deck = new ArrayList<>();
-
-        //créer 20 tiles de chaque type, chacune étant un objet différent? -> 100 objets?? ( sauf First et empty)
-        int compteur_tiles = 0;
-
-        //créer des tiles de chaque type
-        Tile t_tcs = new Tile(TileType.TCS);
-        Tile t_ap = new Tile(TileType.AP);
-        Tile t_n = new Tile(TileType.N);
-        Tile t_is = new Tile(TileType.IS);
-        Tile t_hs = new Tile(TileType.HS);
-
-        //ajouter 20 tiles de type TCS
-        while(compteur_tiles<20){
-            deck.add(t_tcs);
-            compteur_tiles++;
-        }
-        //ajouter 20 tiles de type AP
-        while(compteur_tiles<40){
-            deck.add(t_ap);
-            compteur_tiles++;
-        }
-
-        //ajouter 20 tiles de type N
-        while(compteur_tiles<60){
-            deck.add(t_n);
-            compteur_tiles++;
-        }
-
-        //ajouter 20 tiles de type IS
-        while(compteur_tiles<80) {
-            deck.add(t_is);
-            compteur_tiles++;
-        }
-
-        //ajouter 20 tiles de type HS
-        while(compteur_tiles<100){
-            deck.add(t_hs);
-            compteur_tiles++;
-        }
-        */
     }
 
     public List<Tile>getDeck(){

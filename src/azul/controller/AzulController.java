@@ -171,7 +171,24 @@ public class AzulController
                 gb.drawMalus();
                 window.validate();
 
-                // Fin du tour de ce joueur, on le fera dans une fonction "nextPlayer()"
+                // Fin du tour de ce joueur
+                // Vérifions si centre et disk vides
+                /*
+
+                Si plus de tuiles
+                    On fait le wall tilling de tous les joueurs, on récupère les tuiles en trop et on les met dans la défausse
+                        On compte les points
+                    On compte les points du malus et on met les tuiles du malus dans la défausse (sauf tuile "First")
+                    On vérifie si c'est la fin
+                    Si c'est pas la fin
+                        Nouvelle manche
+                            On remplit le deck avec la discard tant que y'a besoin
+                            On init les disks et le centre
+                                Draw 4 tuiles sur chaque disk
+                                Remet une tuile "First" au centre
+                    Si c'est la fin, on annonce le gagnant dans une nouvelle fenêtre
+
+                 */
                 nextPlayer();
                 setChoosingTilesPhase();
             }
