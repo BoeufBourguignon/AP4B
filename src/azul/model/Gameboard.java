@@ -1,4 +1,4 @@
-package model;
+package azul.model;
 
 import java.util.*;
 
