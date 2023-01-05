@@ -40,7 +40,7 @@
                     MalusToDiscard();
                 }
 
-                if( !Verifier_fin().isEmpty() ){ //s'il y a un ou plusieurs gagnants ?? toujours True wtf????
+                if( !Verifier_fin().isEmpty() ){ 
 
 
                     //créer une fenêtre pour dire le gagnant
