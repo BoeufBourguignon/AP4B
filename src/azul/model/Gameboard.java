@@ -6,7 +6,6 @@ public class Gameboard {
 
     //-----Attributs-----
 
-
     private int score;        //  le score du joueur
     private ArrayList<ArrayList<Tile>>  wall;  // le mur du joueur
     private ArrayList<Tile> malus;    // zone malus
@@ -17,6 +16,7 @@ public class Gameboard {
 
     private int compteur_lignes_completes;
 
+    private ArrayList<Integer> malus_values;
 
     //-----Méthodes-----
 
@@ -26,6 +26,8 @@ public class Gameboard {
     public Gameboard() { // fonctionne!
 
         this.score = 0;
+
+        this.malus_values = new ArrayList<>(List.of(-1,-1,-2,-2,-2,-3,-3)); //liste de référence de valeur pour le malus
 
         //-----création de la "matrice" wall-----
         this.wall = new ArrayList<>();
@@ -187,10 +189,11 @@ public class Gameboard {
      * Fonction qui vide les lignes qui ont été utilisées pour remplir le Wall
      * Les lignes utilisée se verront replies de Tiles de type "Empty"
      */
-    public void clearGrids() { //fonctionne!
+    public List<Tile> clearGrids() { //fonctionne!
 
         int taille_ligne = 1;
         Tile tile_remplacement = new Tile(TileType.Empty);
+        ArrayList<Tile> tile_pas_utilisees = new ArrayList<>();
 
         for(int i=0 ; i<5; i++){ // pour chaque ligne du stock on regarde si elle a été utilisée pour la déco du mur
 
@@ -199,20 +202,25 @@ public class Gameboard {
                 for(int j = 0;j < taille_ligne;j++){
 
                     stock.get(i).add(j,tile_remplacement);
-                    stock.get(i).remove(j);
-
+                    if(stock.get(i).get(j).getType() != TileType.Empty) { // si la tile qu'on enlève n'est pas de type "empty" -> peut-être le cas au début du jeu
+                        tile_pas_utilisees.add(stock.get(i).get(j)); // on ajoute la tile dans la liste à injecter dans la discard à la fin
+                    }
+                    stock.get(i).remove(j); // tile 3empty" ou pas, on la supprime du stock
                 }
             }
             taille_ligne++; //la ligne suivante contient 1 élément en +
         }
+
+        return tile_pas_utilisees; // on retourne la liste des tiles qu'on a pas utilisées dans les lignes pleines du stock
     }
 
     /**
      * Fonction qui s'occupe de remplir le Wall à partir des lignes remplies de Tile ayant un type différent de "Empty"
      */
-    public void WallTilling(){  //fonctionne
+    public List<Tile> WallTilling(){  //fonctionne
 
         int taille_ligne = 1; // la première ligne contient qu'un élément
+        List<Tile> unused_tiles = new ArrayList<>();
 
         for(int i = 0 ;i < 5;i++){
 
@@ -247,10 +255,14 @@ public class Gameboard {
             }
             taille_ligne+=1; // la ligne suivante contient 1 élément en +
         }
+        return clearGrids(); // la liste des tiles pas utilisées dans la déco du mur
     }
 
-
-
+    /**
+     * check si une ligne du wall est pleine ou pas
+     * @param ligne la ligne à examiner
+     * @return true ( remplie) ou false
+     */
     public boolean checkLignePleine(int ligne){ // check si une ligne est pleine
 
 
@@ -261,13 +273,19 @@ public class Gameboard {
 
         return false;
     }
+
+    /**
+     * check si une colonne du wall est pleine ou pas
+     * @param colonne la colonne à examiner
+     * @return true ( remplie) ou false
+     */
     public boolean checkColonnePleine(int colonne){ // check si une ligne est pleine
 
         int compteur_colonne = 1;
         for(int i = 0 ;i < 5;i++){
 
 
-            if( (this.wall.get(i).get(colonne).getType()  != TileType.Empty) ) {
+            if( (this.wall.get(i).get(colonne).getType() != TileType.Empty) ) {
 
                 compteur_colonne++;
             }
@@ -277,7 +295,7 @@ public class Gameboard {
             }
 
         }
-        
+
         if (compteur_colonne == 5){ //colonne pleine ?
 
             return true;
@@ -286,6 +304,82 @@ public class Gameboard {
 
     }
 
+    /**
+     * calcule la valeur d'une ligne non complète
+     * @param ligne la ligne à éxaminer
+     * @return la valeur de cette ligne
+     */
+    public int valeur_ligne(int ligne){
+
+        int valeur = 0;
+
+        for(int i = 0;i<5;i++){
+
+            if(this.wall.get(ligne).get(i).getType() != TileType.Empty){
+                valeur+=1;
+            }
+        }
+
+        if(valeur <5){ //quand 5 éléments sont alignés, c'est la fonction checkLignePleine qui renverra "true" et affectera +5 au score
+            return valeur;
+        }
+        else return 0;
+    }
+
+    /**
+     * calcule la valeur d'une colonne non complète
+     * @param colonne la ligne à éxaminer
+     * @return la valeur de cette colonne
+     */
+    public int valeur_colonne(int colonne){
+
+        int valeur = 0;
+
+        for(int i = 0;i<5;i++){
+
+            if(this.wall.get(i).get(colonne).getType() != TileType.Empty){
+                valeur+=1;
+            }
+        }
+        return valeur;
+    }
+
+    /**
+     * vide le malus mais laisse la Tile "first" si elle est présente
+     * @return la liste des éléments à ajouter dans la discard
+     */
+    public ArrayList<Tile> clearMalus(){
+
+        ArrayList<Tile> elems = new ArrayList<>();
+        for(int i = 0;i  <malus.size();i++){
+
+            if( (i ==0) && (malus.get(i).getType() == TileType.First)){
+                i++;
+            }else {
+                elems.add(malus.get(i));
+                malus.remove(i);
+            }
+        }
+
+        return elems; // les éléments du malus à mettre dans la discard
+    }
+
+    /**
+     * retire la tile "first" si elle est présente
+     * @return True pour attester que la tile était présente et a été retiré ( = ajouté au center) sinon false
+     */
+    public boolean removeTile_First(){ //si la tile "1" se trouve dans le gameboard, on le retire et on retourne true pour dire qu'elle a été trouvée
+
+        if(malus.get(0).getType() == TileType.First){
+            malus.remove(0);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * calcul du score du Gameboard
+     */
     public void computeScore(){
 
 
@@ -298,8 +392,8 @@ public class Gameboard {
                 }else{
                     this.score+=2;
                 }
-
             }
+            score +=valeur_ligne(ligne);
         }
 
         for(int colonne = 0;colonne <5; colonne++){
@@ -307,6 +401,7 @@ public class Gameboard {
             if (checkColonnePleine(colonne) ){
                 this.score+=7;
             }
+            score +=valeur_colonne(colonne);
         }
 
         //on teste si chaque tile est présente 5fois dans le mur, si oui on ajoute 10 au score, sinon on fait rien
@@ -335,5 +430,14 @@ public class Gameboard {
             this.score +=10;
         }
 
+        //section malus
+
+        for(int i = 0; i < malus.size();i++){
+
+            if(malus.get(i).getType() != TileType.Empty){
+                this.score -= malus_values.get(i);// on retire la valeur associée à la case occupée
+            }
+        }
     }
 }
+
