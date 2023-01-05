@@ -175,12 +175,19 @@ public class AzulController
                 // Vérifions si centre et disk vides
                 /*
 
+                fonction verifier disks & centre : bool
                 Si plus de tuiles
+
+                    fonction faire tous les wall tilling : ArrayList<Tile>
                     On fait le wall tilling de tous les joueurs, on récupère les tuiles en trop et on les met dans la défausse
                         On compte les points
+
+                    fonction compter malus : ArrayList<Tile>
                     On compte les points du malus et on met les tuiles du malus dans la défausse (sauf tuile "First")
+
+                    fonction verifier_fin : ArrayList<Player>
                     On vérifie si c'est la fin
-                    Si c'est pas la fin
+                    Si c'est pas la fin (si la taille de la liste est nulle)
                         Nouvelle manche
                             On remplit le deck avec la discard tant que y'a besoin
                             On init les disks et le centre
