@@ -22,6 +22,10 @@ public class Game {
         nbDisk=0;
     }
 
+    /**
+     * Initialise les objets
+     * @throws Exception
+     */
     public void initGame()
             throws Exception
     {

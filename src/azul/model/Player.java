@@ -8,32 +8,58 @@ public class Player
     private boolean isFirstPlayer;
     private final Gameboard gameboard;
 
+    /**
+     * Constructeur
+     * @param nickname Pseudo du joueur
+     */
     public Player(String nickname)
     {
         this.nickname = nickname;
         this.gameboard = new Gameboard();
     }
 
+    /**
+     * Accesseur du pseudo du joueur
+     * @return nickname
+     */
     public String getNickname()
     {
         return this.nickname;
     }
 
+    /**
+     * Accesseur du booléen indiquant si le joueur est le premier à jouer
+     * @return isFirstPlayer
+     */
     public boolean isFirstPlayer()
     {
         return this.isFirstPlayer;
     }
 
+    /**
+     * Mutateur du booléen indiquant si le joueur est le premier à jouer
+     * @param isFirstPlayer Premier à jouer
+     */
     public void setFirstPlayer(boolean isFirstPlayer)
     {
         this.isFirstPlayer = isFirstPlayer;
     }
 
+    /**
+     * Accesseur du gameboard du joueur
+     * @return gameboard
+     */
     public Gameboard getGameboard()
     {
         return this.gameboard;
     }
 
+    /**
+     * Permet au joueur de piocher toutes les tuiles d'un type sur un disk
+     * @param disk Disque sur lequel piocher
+     * @param tileType Type à piocher
+     * @return Liste des tuiles piochées
+     */
     public ArrayList<Tile> pickTiles(Disk disk, TileType tileType)
     {
         // Pioche les tuiles

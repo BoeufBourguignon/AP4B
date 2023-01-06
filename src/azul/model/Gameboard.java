@@ -49,34 +49,15 @@ public class Gameboard {
         stock.add(new ArrayList<>());
         stock.add(new ArrayList<>());
         stock.add(new ArrayList<>());
-
-//        Tile t_stock = new Tile(TileType.Empty); //On créé une Tile de type "vide" pour pouvoir remplir le wall au début
-
-//        ArrayList<Tile> ligne1_stock = new ArrayList<>(List.of(t_stock));
-//        stock.add(ligne1_stock);
-//        ArrayList<Tile> ligne2_stock = new ArrayList<>(List.of(t_stock,t_stock));
-//        stock.add(ligne2_stock);
-//        ArrayList<Tile> ligne3_stock = new ArrayList<>(List.of(t_stock,t_stock,t_stock));
-//        stock.add(ligne3_stock);
-//        ArrayList<Tile> ligne4_stock = new ArrayList<>(List.of(t_stock,t_stock,t_stock,t_stock));
-//        stock.add(ligne4_stock);
-//        ArrayList<Tile> ligne5_stock = new ArrayList<>(List.of(t_stock,t_stock,t_stock,t_stock,t_stock));
-//        stock.add(ligne5_stock);
-
         //-----
-
 
         //-----création du "tableau" malus-----
         this.malus = new ArrayList<>();  //tableau de 7 cases
-
-//        for (int i=0;i<7;i++){
-//            Tile t_malus = new Tile(TileType.Empty); //On créé une Tile de type "vide" pour pouvoir remplir le malus au début
-//            malus.add(t_malus);
-//        }
         //-----
 
         //-----création de la "matrice" de reference_wall-----
         this.reference_wall = new ArrayList<>();
+        //-----
 
         ArrayList<TileType> ligne1 = new ArrayList<>(List.of(TileType.TCS,TileType.AP,TileType.N,TileType.IS,TileType.HS));
         reference_wall.add(ligne1);
@@ -183,12 +164,9 @@ public class Gameboard {
                     // Ligne dispo si :
                     //  wall pas déjà rempli avec cette couleur ET vide OU (reste de la place ET tuiles du même type)
 
-                    // Determinons la position de la tile sur le wall, avec son type et la ligne
-                    TileType stockedType = tiles.get(0).getType();
-
                     if(stock.get(stockLine).size() == 0)
                     {
-                        if(wall.get(stockLine).get(reference_wall.get(stockLine).indexOf(stockedType)).getType() != TileType.Empty)
+                        if(wall.get(stockLine).get(reference_wall.get(stockLine).indexOf(type)).getType() != TileType.Empty)
                         {
                             canBeStocked = false;
                         }
@@ -259,41 +237,6 @@ public class Gameboard {
      */
     public ArrayList<Tile> wallTilling(){  //fonctionne
 
-//        int taille_ligne = 1; // la première ligne contient qu'un élément
-//
-//        for(int i = 0 ;i < 5;i++){
-//
-//            if (stock.get(i).toArray().length >0 ) {
-//
-//                int compteur_elements_ligne = 0; // index de l'élément sur la ligne actuelle
-//
-//                for(int j=0 ; j<taille_ligne ;j++){
-//
-//                    if (stock.get(i).get(j).getType() == TileType.Empty) { //si l'élément de la ligne est une tile "vide"
-//                        break;
-//
-//                    }else {
-//
-//                        compteur_elements_ligne += 1;
-//
-//                        if (compteur_elements_ligne == taille_ligne) { // si la ligne n'est pas vide => procédure de placement
-//
-//                            Tile tile_vide = new Tile(TileType.Empty);
-//                            Tile tile_a_placer = stock.get(i).get(0); // on récupère la première Tile de la ligne
-//
-//                            stock.get(i).remove(0); //on retire la première tile du stock
-//                            stock.get(i).add(0,tile_vide); // on mets une tile vide à la place
-//
-//                            TileType type = tile_a_placer.getType(); // on récupère son type
-//
-//                            int indice = reference_wall.get(i).indexOf(type); // on récupère, sur le wall, l'indice au quel se situe le type de la tile à placer
-//                            wall.get(i).set(indice, tile_a_placer); //ajoute la tile à cet indice dans le Wall
-//                        }
-//                    }
-//                }
-//            }
-//            taille_ligne+=1; // la ligne suivante contient 1 élément en +
-//        }
         ArrayList<Tile> unused = new ArrayList<>();
 
         for(int i = 0; i < 5; ++i)
@@ -313,37 +256,6 @@ public class Gameboard {
         }
 
         return unused;
-        //return clearGrids(); // la liste des tiles pas utilisées dans la déco du mur
-    }
-
-    public ArrayList<Tile> calculerMalus(Tile tileFirst)
-    {
-        ArrayList<Tile> tuilesAJeter;
-        switch(malus.size())
-        {
-            case 7:
-                score -= 3;
-            case 6:
-                score -= 3;
-            case 5:
-                score -= 2;
-            case 4:
-                score -= 2;
-            case 3:
-                score -= 2;
-            case 2:
-                score -= 1;
-            case 1:
-                score -= 1;
-        }
-        if(score < 0) score = 0;
-
-        malus.remove(tileFirst);
-
-        tuilesAJeter = new ArrayList<>(malus);
-        malus.clear();
-
-        return tuilesAJeter;
     }
 
     /**
