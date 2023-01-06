@@ -27,7 +27,7 @@ public class Gameboard {
 
         this.score = 0;
 
-        this.malus_values = new ArrayList<>(List.of(-1,-1,-2,-2,-2,-3,-3)); //liste de référence de valeur pour le malus
+        this.malus_values = new ArrayList<>(List.of(1,1,2,2,2,3,3)); //liste de référence de valeur pour le malus
 
         //-----création de la "matrice" wall-----
         this.wall = new ArrayList<>();
@@ -169,12 +169,12 @@ public class Gameboard {
                 tiles.remove(tiles.get(i));
             }
 
-            if(tiles.size() != 0)
+            //On revérifie au cas où la tuile First était la seule sélectionnée
+            if(tiles.size() > 0)
             {
                 if(stockLine == 5)
                 {
                     // Stock dans la zone malus
-                    // !!! Normalement ce qui ne peut pas être socké dans la zone malus, va dans la défausse !!!
                     malus.addAll(tiles);
                 }
                 else
@@ -184,9 +184,21 @@ public class Gameboard {
                     //  wall pas déjà rempli avec cette couleur ET vide OU (reste de la place ET tuiles du même type)
 
                     // Determinons la position de la tile sur le wall, avec son type et la ligne
+                    TileType stockedType = tiles.get(0).getType();
 
+                    if(stock.get(stockLine).size() == 0)
+                    {
+                        if(wall.get(stockLine).get(reference_wall.get(stockLine).indexOf(stockedType)).getType() != TileType.Empty)
+                        {
+                            canBeStocked = false;
+                        }
+                    }
+                    else if(stock.get(stockLine).size() == stockLine + 1 || stock.get(stockLine).get(0).getType() != type)
+                    {
+                        canBeStocked = false;
+                    }
 
-                    if(stock.get(stockLine).size() == 0 || (stock.get(stockLine).size() < stockLine + 1 && stock.get(stockLine).get(0).getType() == type))
+                    if(canBeStocked)
                     {
                         // La ligne peut être stockée
                         // Il faut stocker ce que l'on peut
@@ -203,10 +215,6 @@ public class Gameboard {
                             }
                         });
 
-                    }
-                    else
-                    {
-                        canBeStocked = false;
                     }
                 }
             }
@@ -462,6 +470,7 @@ public class Gameboard {
     public void computeScore(){
 
 
+        // Pour chaque ligne, regarde si elle est pleine
         for(int ligne = 0;ligne<5;ligne++){
             if(checkLignePleine(ligne)){
                 this.compteur_lignes_completes ++;
@@ -480,7 +489,7 @@ public class Gameboard {
             if (checkColonnePleine(colonne) ){
                 this.score+=7;
             }
-            score +=valeur_colonne(colonne);
+            //score +=valeur_colonne(colonne);
         }
 
         //on teste si chaque tile est présente 5fois dans le mur, si oui on ajoute 10 au score, sinon on fait rien
@@ -511,11 +520,9 @@ public class Gameboard {
 
         //section malus
 
-        for(int i = 0; i < malus.size();i++){
+        for(int i = 0; i < (Math.min(malus.size(), 7)) ; i++){
 
-            if(malus.get(i).getType() != TileType.Empty){
-                this.score -= malus_values.get(i);// on retire la valeur associée à la case occupée
-            }
+            this.score -= malus_values.get(i);// on retire la valeur associée à la case occupée
         }
     }
 }

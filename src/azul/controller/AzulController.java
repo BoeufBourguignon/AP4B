@@ -152,52 +152,6 @@ public class AzulController
         }
     }
 
-//    private void stockTiles(View_Game.PanGameboard gb, int row)
-//    {
-//        if(selectedTiles != null)
-//        {
-//            boolean isStocked = gb.getGameboard().fillStockline(row, selectedTiles);
-//
-//            if(isStocked)
-//            {
-//                // On n'a plus besoin de la liste de tuiles sélectionnées
-//                selectedTiles = null;
-//                // On recharge la vue du stock du gameboard et du malus
-//                gb.drawStock();
-//                gb.drawMalus();
-//                window.validate();
-//
-//                // Fin du tour de ce joueur
-//                // Vérifions si centre et disk vides
-//                /*
-//
-//                fonction verifier disks & centre : bool
-//                Si plus de tuiles
-//
-//                    fonction faire tous les wall tilling : ArrayList<Tile>
-//                    On fait le wall tilling de tous les joueurs, on récupère les tuiles en trop et on les met dans la défausse
-//                        On compte les points
-//
-//                    fonction compter malus : ArrayList<Tile>
-//                    On compte les points du malus et on met les tuiles du malus dans la défausse (sauf tuile "First")
-//
-//                    fonction verifier_fin : ArrayList<Player>
-//                    On vérifie si c'est la fin
-//                    Si c'est pas la fin (si la taille de la liste est nulle)
-//                        Nouvelle manche
-//                            On remplit le deck avec la discard tant que y'a besoin
-//                            On init les disks et le centre
-//                                Draw 4 tuiles sur chaque disk
-//                                Remet une tuile "First" au centre
-//                    Si c'est la fin, on annonce le gagnant dans une nouvelle fenêtre
-//
-//                 */
-//                nextPlayer();
-//                setChoosingTilesPhase();
-//            }
-//        }
-//    }
-
     //fonction avec rajout de ce qu'il manquait
     private void stockTiles(View_Game.PanGameboard gb, int row)
     {
@@ -214,43 +168,16 @@ public class AzulController
                 gb.drawMalus();
                 window.validate();
 
-                // Fin du tour de ce joueur
-                // Vérifions si centre et disk vides
-                 /*
-                Si plus de tuiles
-                   // On fait le wall tilling de tous les joueurs, on récupère les tuiles en trop et on les met dans la défausse
-                       // On compte les points
-                    //(inclus dans le calcul du score -> )On compte les points du malus
-                     //on met les tuiles du malus dans la défausse (sauf tuile "First")
-                   // On vérifie si c'est la fin
-                    //Si c'est pas la fin
-                        //Nouvelle manche
-                            //On remplit le deck avec la discard tant que y'a besoin
-                            //On init les disks et le centre
-                                //Draw 4 tuiles sur chaque disk
-                                //Remet une tuile "First" au centre
-                    Si c'est la fin, on annonce le gagnant dans une nouvelle fenêtre
-                 */
-                // Ajout commence ici
                 boolean are_empty = verifierFinManche(); //disks + centre sont vides
 
                 if(are_empty){
                     DecorerMur();
-
                     calculerScores();
+
                     MalusToDiscard();
                     retirerTile1();// enlève le "1" du gameboard où elle se trouve et la met dans le Center pour la manche suivante
                     //Actualisation des gameboards
-                    ((View_Game) window).getListPanGameboards().forEach((player, gbs) -> {
-                        //On met à jour les murs dans la vue
-                        gbs.drawWall();
-                        gbs.drawStock();
-                        //On met à jour la zone malus
-                        gbs.drawMalus();
-                    });
-                    //On met à jour le centre (avec la tuile 1)
-                    ((View_Game) window).getCenterPanDisk().drawDisk();
-                    window.validate();
+                    updateView_Gameboards();
 
 
                     if( !Verifier_fin().isEmpty() ){
@@ -262,7 +189,7 @@ public class AzulController
                         annonce_gagnant.setTitle("Le gagnant !");
                         //Définit sa taille : 400 pixels de large et 200 pixels de haut
                         annonce_gagnant.setSize(400, 200);
-                        JLabel label = new JLabel("Le gagnant est:" + AnnoncerGagnant() );
+                        JLabel label = new JLabel("Le gagnant est:" + AnnoncerGagnant().getNickname() );
                         label.setHorizontalAlignment(SwingConstants.CENTER);
                         annonce_gagnant.add(label, BorderLayout.CENTER);
 
@@ -276,11 +203,7 @@ public class AzulController
                         assezDeTuiles(); // s'il n'y a pas plus assez de tiles dans le deck, on remplit celui-ci avec la discard
                         fillDisks(); // remplissage des disks
                         // Réaffichage des disks
-                        ((View_Game) window).getListPanDisks().forEach(View_Game.PanDisk::drawDisk);
-                        ((View_Game) window).getCenterPanDisk().drawDisk();
-                        window.validate();
-                        //Reaffectation des events sur les disks
-                        putEventsOnDisks();
+                        updateView_Disks();
                     }
                 }
 
@@ -465,5 +388,30 @@ public class AzulController
                         )
                 )
         );
+    }
+
+    private void updateView_Gameboards()
+    {
+        ((View_Game) window).getListPanGameboards().forEach((player, gbs) -> {
+            //On met à jour les murs dans la vue
+            gbs.drawWall();
+            gbs.drawStock();
+            //On met à jour la zone malus
+            gbs.drawMalus();
+            //On met à jour le score
+            gbs.drawScore();
+        });
+        //On met à jour le centre (avec la tuile 1)
+        ((View_Game) window).getCenterPanDisk().drawDisk();
+        window.validate();
+    }
+
+    private void updateView_Disks()
+    {
+        ((View_Game) window).getListPanDisks().forEach(View_Game.PanDisk::drawDisk);
+        ((View_Game) window).getCenterPanDisk().drawDisk();
+        window.validate();
+        //Reaffectation des events sur les disks
+        putEventsOnDisks();
     }
 }

@@ -282,6 +282,7 @@ public class View_Game extends JFrame
         private final JPanel panMalus;
         private final ArrayList<BtnRow> listRowsBtns = new ArrayList<>();
         private final JButton btnMalus;
+        private final JLabel score;
 
         private PanGameboard(Player p)
         {
@@ -291,6 +292,7 @@ public class View_Game extends JFrame
             panBtns = new JPanel();
             panWall = new JPanel();
             panMalus = new JPanel();
+            score = new JLabel();
 
             btnMalus = new JButton();
             btnMalus.setPreferredSize(dimTile);
@@ -303,7 +305,9 @@ public class View_Game extends JFrame
 
             c.insets = new Insets(5, 5, 5, 5);
 
-            c.gridy = 0; c.gridx = 0; c.gridwidth = 3;
+            c.gridy = 0; c.gridx = 0; c.gridwidth = 1;
+            add(score);
+            c.gridy = 0; c.gridx = 1; c.gridwidth = 2;
             add(new JLabel(player.getNickname(), JLabel.CENTER), c);
             c.gridy = 1; c.gridx = 0; c.gridwidth = 1;
             add(panStock, c);
@@ -321,6 +325,7 @@ public class View_Game extends JFrame
             drawBtns();
             drawWall();
             drawMalus();
+            drawScore();
         }
 
         public void drawStock()
@@ -372,11 +377,11 @@ public class View_Game extends JFrame
                     {
                         switch (referenceWall.get(i).get(j))
                         {
-                            case AP -> panTileTmp.setBackground(new Color(159, 182, 255)); // AP
-                            case IS -> panTileTmp.setBackground(new Color(255, 255, 200)); // IS
-                            case N -> panTileTmp.setBackground(new Color(255, 200, 255)); // N
-                            case TCS -> panTileTmp.setBackground(new Color(255, 207, 173)); // TCS
-                            case HS -> panTileTmp.setBackground(new Color(200, 255, 200)); // HS
+                            case AP -> panTileTmp.setBackground(new Color(159, 182, 255, 70)); // AP
+                            case IS -> panTileTmp.setBackground(new Color(255, 255, 200, 70)); // IS
+                            case N -> panTileTmp.setBackground(new Color(255, 200, 255, 70)); // N
+                            case TCS -> panTileTmp.setBackground(new Color(255, 207, 173, 70)); // TCS
+                            case HS -> panTileTmp.setBackground(new Color(200, 255, 200, 70)); // HS
                         }
                     }
                     else
@@ -429,6 +434,11 @@ public class View_Game extends JFrame
 
                 panMalus.add(t);
             }
+        }
+
+        public void drawScore()
+        {
+            score.setText("Score : " + player.getGameboard().getScore());
         }
 
         public ArrayList<BtnRow> getListRowsBtns()
