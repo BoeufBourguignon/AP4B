@@ -3,7 +3,6 @@ package azul.model;
 import java.util.*;
 
 public class Center extends Disk {
-
     //-----Attributs-----
     private Tile FirstTile;
 
@@ -13,7 +12,7 @@ public class Center extends Disk {
     /**
      * Constructeur
      */
-    public Center(){
+    public Center() {
 
         super();
         this.FirstTile = new Tile(TileType.First);
@@ -23,8 +22,9 @@ public class Center extends Disk {
     /**
      * Déclaration du type de "FirstTile"
      */
-    public void setFirstTile(TileType tile) {
+    public void setFirstTile() {
         this.FirstTile = new Tile(TileType.First);
+        disk.add(0, FirstTile);
     }
 
     /**

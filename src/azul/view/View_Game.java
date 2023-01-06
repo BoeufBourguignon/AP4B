@@ -30,17 +30,22 @@ public class View_Game extends JFrame
 
         this.game = game;
 
-        setLayout(new GridLayout(2,1));
+        setLayout(new GridBagLayout());
 
         // Partie supérieure : Les disques
         panDisks = new JPanel();
-        add(panDisks);
+        c.gridx = 0; c.gridy = 0;
+        add(panDisks, c);
 
         // Partie inférieure : Les gameboards
         panGameboards = new JPanel();
-        add(panGameboards);
+        panGameboards.setLayout(new GridBagLayout());
+        c.gridx = 0; c.gridy = 1;
+        add(panGameboards, c);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setExtendedState(MAXIMIZED_BOTH);
+        setMinimumSize(Toolkit.getDefaultToolkit().getScreenSize());
     }
 
     public void initGame()
@@ -48,7 +53,6 @@ public class View_Game extends JFrame
         // Partie supérieure : Disques
         // Un panel avec text et disques, un autre panel avec text et centre
 
-        // Disks
         //   Disks
         JPanel panDisks_BagDisks = new JPanel();
         panDisks_BagDisks.setLayout(new GridBagLayout());
@@ -81,13 +85,46 @@ public class View_Game extends JFrame
 
 
         // Partie inférieure : Gameboards
-        game.getPlayers().forEach(player -> {
-            PanGameboard gb = new PanGameboard(player);
-            listPanGameboards.put(player, gb);
-            panGameboards.add(gb);
-        });
+        for(int i = 0; i < game.getPlayers().size(); ++i)
+        {
+            PanGameboard gb = new PanGameboard(game.getPlayers().get(i));
+            listPanGameboards.put(game.getPlayers().get(i), gb);
+            c.insets = new Insets(5,5,5,5);
+            if(i == 0)
+            {
+                c.gridy = 0; c.gridx = 0;
+            }
+            else if(i == 1)
+            {
+                c.gridy = 0; c.gridx = 1;
+            }
+            else
+            {
+                if(game.getPlayers().size() == 3)
+                {
+                    c.gridy = 1;
+                    c.gridx = 0;
+                    c.gridwidth = 2;
+                }
+                else if(i == 2)
+                {
+                    c.gridy = 1;
+                    c.gridx = 0;
+                }
+                else
+                {
+                    c.gridy = 1;
+                    c.gridx = 1;
+                }
+            }
+            panGameboards.add(gb, c);
+        }
 
-        pack();
+//        game.getPlayers().forEach(player -> {
+//            PanGameboard gb = new PanGameboard(player);
+//            listPanGameboards.put(player, gb);
+//            panGameboards.add(gb);
+//        });
     }
 
     public ArrayList<PanDisk> getListPanDisks()
@@ -227,6 +264,10 @@ public class View_Game extends JFrame
                 setMargin(new Insets(1,1,1,1));
                 setPreferredSize(dimTile);
                 setBackground(getTileColor(tile.getType()));
+                if(tile.getType() == TileType.AP)
+                {
+                    setForeground(Color.WHITE);
+                }
             }
 
             public Tile getTile()
@@ -245,6 +286,7 @@ public class View_Game extends JFrame
         private final JPanel panMalus;
         private final ArrayList<BtnRow> listRowsBtns = new ArrayList<>();
         private final JButton btnMalus;
+        private final JLabel score;
 
         private PanGameboard(Player p)
         {
@@ -254,6 +296,7 @@ public class View_Game extends JFrame
             panBtns = new JPanel();
             panWall = new JPanel();
             panMalus = new JPanel();
+            score = new JLabel();
 
             btnMalus = new JButton();
             btnMalus.setPreferredSize(dimTile);
@@ -266,7 +309,9 @@ public class View_Game extends JFrame
 
             c.insets = new Insets(5, 5, 5, 5);
 
-            c.gridy = 0; c.gridx = 0; c.gridwidth = 3;
+            c.gridy = 0; c.gridx = 0; c.gridwidth = 1;
+            add(score);
+            c.gridy = 0; c.gridx = 1; c.gridwidth = 2;
             add(new JLabel(player.getNickname(), JLabel.CENTER), c);
             c.gridy = 1; c.gridx = 0; c.gridwidth = 1;
             add(panStock, c);
@@ -284,6 +329,7 @@ public class View_Game extends JFrame
             drawBtns();
             drawWall();
             drawMalus();
+            drawScore();
         }
 
         public void drawStock()
@@ -321,6 +367,7 @@ public class View_Game extends JFrame
             panWall.removeAll();
 
             ArrayList<ArrayList<Tile>> wall = player.getGameboard().getWall();
+            ArrayList<ArrayList<TileType>> referenceWall = player.getGameboard().getReference_wall();
             panWall.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
             panWall.setLayout(new GridLayout(5, 5));
             for(int i = 0; i < 5; ++i)
@@ -332,14 +379,13 @@ public class View_Game extends JFrame
                     TileType type = wall.get(i).get(j).getType();
                     if(type == TileType.Empty)
                     {
-                        //Devinons le type attendu selon les coordonnées
-                        switch ((5 + (i - j)) % 5)
+                        switch (referenceWall.get(i).get(j))
                         {
-                            case 0 -> panTileTmp.setBackground(new Color(200, 200, 255)); // AP
-                            case 1 -> panTileTmp.setBackground(new Color(255, 255, 200)); // IS
-                            case 2 -> panTileTmp.setBackground(new Color(255, 200, 255)); // N
-                            case 3 -> panTileTmp.setBackground(new Color(255, 243, 200)); // TCS
-                            case 4 -> panTileTmp.setBackground(new Color(200, 255, 200)); // HS
+                            case AP -> panTileTmp.setBackground(new Color(159, 182, 255, 150)); // AP
+                            case IS -> panTileTmp.setBackground(new Color(255, 255, 200, 150)); // IS
+                            case N -> panTileTmp.setBackground(new Color(255, 200, 255, 150)); // N
+                            case TCS -> panTileTmp.setBackground(new Color(255, 207, 173, 150)); // TCS
+                            case HS -> panTileTmp.setBackground(new Color(200, 255, 200, 150)); // HS
                         }
                     }
                     else
@@ -392,6 +438,11 @@ public class View_Game extends JFrame
 
                 panMalus.add(t);
             }
+        }
+
+        public void drawScore()
+        {
+            score.setText("Score : " + player.getGameboard().getScore());
         }
 
         public ArrayList<BtnRow> getListRowsBtns()

@@ -6,7 +6,7 @@ public class Game {
     private int nbPlayer;
     private int nbDisk;
     private Deck deck;
-    private ArrayList<Tile> discard;
+    private Discard discard;
     private final ArrayList<Player> players;
     private ArrayList<Disk> disks;
     private Center center;
@@ -35,7 +35,7 @@ public class Game {
         deck = new Deck();
 
         // Instanciation du discard
-        discard = new ArrayList<>();
+        discard = new Discard();
 
         // Instanciation des disks
         nbDisk = 2 * nbPlayer + 1;
@@ -52,8 +52,13 @@ public class Game {
 
         center = new Center();
     }
-    
-     /**
+
+    public Discard getDiscard()
+    {
+        return discard;
+    }
+
+    /**
      * Mutateur du nombre total de joueur
      *
      * @param nbPlayer : le nombre de joueurs choisis en debut de partie
@@ -94,7 +99,7 @@ public class Game {
      /**
      * Accesseur du premier joueur
      *
-     * @return le joueur ayant la tuile numéro 1 
+     * @return le joueur ayant la tuile numéro 1
      */
     public Player getFirstPlayer()
     {
@@ -108,7 +113,7 @@ public class Game {
 
         return firstPlayer;
     }
-    
+
      /**
      * Accesseur des disks
      *
@@ -129,13 +134,18 @@ public class Game {
         return center;
     }
 
-    
+    public Deck getDeck()
+    {
+        return deck;
+    }
+
+
      /**
      *
      * @param player : joueur dont c'est le tour de jouer
      * @param disk : disk selectionné par le joueur
      * @param type : type de tile choisit  par le joueur
-     * @return : la liste contenant toutes les tiles de la catégorie choisit du disk choisit 
+     * @return : la liste contenant toutes les tiles de la catégorie choisit du disk choisit
      */
     public ArrayList<Tile> playerPickTile(Player player, Disk disk, TileType type)
     {

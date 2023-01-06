@@ -1,13 +1,19 @@
 package azul.view;
 
+import azul.model.TileType;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 public class View_Accueil extends JFrame
 {
     JLabel lblVerifyPseudos;
-    private final JButton btnValider = new JButton("Valider");
+    private final JButton btnValider;
     private ArrayList<JTextField> listePseudos = new ArrayList<>();
     private final ArrayList<JButton> listeBtnsPremierJoueur = new ArrayList<>();
 
@@ -15,26 +21,40 @@ public class View_Accueil extends JFrame
     {
         super("AZUL UTBM - Accueil");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(false);
+        setExtendedState(MAXIMIZED_BOTH);
+        setMinimumSize(Toolkit.getDefaultToolkit().getScreenSize());
 
+        Enumeration<Object> keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get (key);
+            if (value instanceof javax.swing.plaf.FontUIResource)
+                UIManager.put (key, new javax.swing.plaf.FontUIResource("Futura",Font.BOLD,14));
+        }
+
+        btnValider = new JButton("Valider");
 
         // D'abord on demande le nombre de joueurs
-        setContentPane(new PanNbJoueurs());
-        resize();
+        loadNewPanel(new PanNbJoueurs());
     }
 
     private void loadPanPseudos(int nbJoueurs)
     {
-        PanPseudosJoueurs panPseudosJoueurs = new PanPseudosJoueurs(nbJoueurs);
-        setContentPane(panPseudosJoueurs);
-        resize();
+        loadNewPanel(new PanPseudosJoueurs(nbJoueurs));
     }
 
     public void loadPanAskPremierJoueur()
     {
-        PanChoixPremierJoueur panChoixPremierJoueur = new PanChoixPremierJoueur(getPseudos());
-        setContentPane(panChoixPremierJoueur);
-        resize();
+        loadNewPanel(new PanChoixPremierJoueur(getPseudos()));
+    }
+
+    private void loadNewPanel(JPanel pan)
+    {
+        JPanel content = new JPanel();
+        setContentPane(content);
+        content.setLayout(new GridBagLayout());
+        getContentPane().add(pan);
+        validate();
     }
 
     public JButton getBtnValider()
@@ -52,12 +72,6 @@ public class View_Accueil extends JFrame
         ArrayList<String> pseudos = new ArrayList<>();
         listePseudos.forEach(e -> pseudos.add(e.getText()));
         return pseudos;
-    }
-
-    private void resize()
-    {
-        pack();
-        setSize(new Dimension((int)(getWidth() * 1.5), (int)(getHeight() * 1.5)));
     }
 
     public boolean verifyPseudos()
@@ -113,6 +127,13 @@ public class View_Accueil extends JFrame
             btnDeuxJoueurs.addActionListener(e -> loadPanPseudos(2));
             btnTroisJoueurs.addActionListener(e -> loadPanPseudos(3));
             btnQuatreJoueurs.addActionListener(e -> loadPanPseudos(4));
+
+            JPanel panBoutonRegles = new JPanel();
+            JButton btnRegles = new JButton("Règles");
+            panBoutonRegles.add(btnRegles);
+            add(panBoutonRegles);
+
+            btnRegles.addActionListener(e -> loadNewPanel(new PanRegles()));
         }
     }
 
@@ -153,8 +174,7 @@ public class View_Accueil extends JFrame
             add(panBtns);
 
             btnRetour.addActionListener(e -> {
-                View_Accueil.this.setContentPane(new PanNbJoueurs());
-                View_Accueil.this.resize();
+                loadNewPanel(new PanNbJoueurs());
             });
         }
     }
@@ -185,11 +205,133 @@ public class View_Accueil extends JFrame
                 add(panBtns);
 
                 btnRetour.addActionListener(e -> {
-                    View_Accueil.this.setContentPane(new PanPseudosJoueurs(pseudos.size()));
-                    View_Accueil.this.resize();
+                    loadNewPanel(new PanPseudosJoueurs(pseudos.size()));
                 });
 
             }
+        }
+    }
+
+    private class PanRegles extends JPanel
+    {
+        private PanRegles()
+        {
+            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+            Dimension spacing = new Dimension(0, 30);
+
+            JPanel panLienRegles = new JPanel();
+            JButton btnRegles = new JButton("Voir les règles en ligne");
+            panLienRegles.add(btnRegles);
+            add(panLienRegles);
+
+            btnRegles.addActionListener(e -> {
+                if(Desktop.isDesktopSupported())
+                {
+                    try {
+                        URI link = new URI("https://www.regledujeu.fr/azul/");
+                        Desktop.getDesktop().browse(link);
+                    } catch (URISyntaxException | IOException ex) {
+                        throwDialogErrorLienRegles();
+                    }
+                }
+                else
+                {
+                    throwDialogErrorLienRegles();
+                }
+            });
+
+            add(Box.createRigidArea(spacing));
+
+            JPanel panNouvellesTiles = new JPanel();
+            panNouvellesTiles.setLayout(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
+
+            c.gridy = c.gridx = 0; c.gridwidth = 2;
+            panNouvellesTiles.add(new JLabel("Cette version du jeu de Azul change les tuiles."), c);
+            c.gridy++; c.insets = new Insets(0, 0, 30, 0);
+            panNouvellesTiles.add(new JLabel("Voici celles utilisées ici :"), c);
+
+            c.gridy++; c.gridwidth = 1; c.insets = new Insets(0,0,0,0);
+            panNouvellesTiles.add(createPanTiles(TileType.AP), c);
+            c.gridx = 1;
+            panNouvellesTiles.add(new JLabel("Algorithmique & programmation"), c);
+            c.gridy++; c.gridx = 0;
+            panNouvellesTiles.add(createPanTiles(TileType.IS), c);
+            c.gridx = 1;
+            panNouvellesTiles.add(new JLabel("Systèmes d'informations"), c);
+            c.gridy++; c.gridx = 0;
+            panNouvellesTiles.add(createPanTiles(TileType.N), c);
+            c.gridx = 1;
+            panNouvellesTiles.add(new JLabel("Réseaux"), c);
+            c.gridy++; c.gridx = 0;
+            panNouvellesTiles.add(createPanTiles(TileType.TCS), c);
+            c.gridx = 1;
+            panNouvellesTiles.add(new JLabel("Informatique théorique"), c);
+            c.gridy++; c.gridx = 0;
+            panNouvellesTiles.add(createPanTiles(TileType.HS), c);
+            c.gridx = 1;
+            panNouvellesTiles.add(new JLabel("Hardware & systèmes"), c);
+            c.gridy++; c.gridx = 0;
+            panNouvellesTiles.add(createPanTiles(TileType.First), c);
+            c.gridx = 1;
+            panNouvellesTiles.add(new JLabel("Tuile du premier joueur. Celui qui la pioche jouera en premier au tour suivant"), c);
+
+            add(panNouvellesTiles);
+
+            add(Box.createRigidArea(spacing));
+
+            JPanel panBoutonRetour = new JPanel();
+            JButton btnRetour = new JButton("Retour");
+            panBoutonRetour.add(btnRetour);
+            add(panBoutonRetour);
+
+            btnRetour.addActionListener(e -> loadNewPanel(new PanNbJoueurs()));
+        }
+
+        private JPanel createPanTiles(TileType type)
+        {
+            Dimension dimTile = new Dimension(50,50);
+
+            JPanel panTiles = new JPanel();
+
+            JPanel panTileNormale = new JPanel();
+            panTileNormale.setPreferredSize(dimTile);
+            switch(type)
+            {
+                case AP -> panTileNormale.setBackground(Color.BLUE);
+                case IS -> panTileNormale.setBackground(Color.YELLOW);
+                case N -> panTileNormale.setBackground(Color.MAGENTA);
+                case TCS -> panTileNormale.setBackground(Color.ORANGE);
+                case HS -> panTileNormale.setBackground(Color.GREEN);
+                case First -> panTileNormale.setBackground(Color.RED);
+            }
+            panTiles.add(panTileNormale);
+
+            if(type != TileType.First)
+            {
+                JPanel panTilePastel = new JPanel();
+                panTilePastel.setPreferredSize(dimTile);
+                switch (type)
+                {
+                    case AP -> panTilePastel.setBackground(new Color(159, 182, 255, 150)); // AP
+                    case IS -> panTilePastel.setBackground(new Color(255, 255, 200, 150)); // IS
+                    case N -> panTilePastel.setBackground(new Color(255, 200, 255, 150)); // N
+                    case TCS -> panTilePastel.setBackground(new Color(255, 207, 173, 150)); // TCS
+                    case HS -> panTilePastel.setBackground(new Color(200, 255, 200, 150)); // HS
+                }
+                panTiles.add(panTilePastel);
+            }
+
+            return panTiles;
+        }
+
+        private void throwDialogErrorLienRegles()
+        {
+            JOptionPane.showMessageDialog(View_Accueil.this,
+                    "L'application ne peut pas ouvrir directement les règles dans votre navigateur\n" +
+                            "Veuillez utiliser ce lien dans votre navigateur : https://www.regledujeu.fr/azul/",
+                    "Erreur ouverture du lien",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 }
