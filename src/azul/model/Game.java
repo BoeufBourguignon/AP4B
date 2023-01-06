@@ -129,6 +129,14 @@ public class Game {
         return center;
     }
 
+    
+     /**
+     *
+     * @param player : joueur dont c'est le tour de jouer
+     * @param disk : disk selectionné par le joueur
+     * @param type : type de tile choisit  par le joueur
+     * @return : la liste contenant toutes les tiles de la catégorie choisit du disk choisit 
+     */
     public ArrayList<Tile> playerPickTile(Player player, Disk disk, TileType type)
     {
         // Prend les tuiles
