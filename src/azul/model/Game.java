@@ -11,6 +11,9 @@ public class Game {
     private ArrayList<Disk> disks;
     private Center center;
 
+     /**
+     * Constructeur de Game
+     */
     public Game()
     {
         players = new ArrayList<>();
@@ -49,26 +52,50 @@ public class Game {
 
         center = new Center();
     }
-
+    
+     /**
+     * Mutateur du nombre total de joueur
+     *
+     * @param nbPlayer : le nombre de joueurs choisis en debut de partie
+     */
     public void setNbPlayer(int nbPlayer) {
         this.nbPlayer = nbPlayer;
     }
 
+     /**
+     * Mutateur du premier joueur
+     *
+     * @param player : le joueur étant le premier joueur
+     */
     public void setFirstPlayer(Player player)
     {
         player.setFirstPlayer(true);
     }
 
+     /**
+     *
+     * @param player : le joueur à ajouter à la liste qui regroupe tous les joueurs du jeu
+     */
     public void addPlayer(Player player)
     {
         players.add(player);
     }
 
+     /**
+     * Accesseur des joueurs
+     *
+     * @return une liste avec tous les joueurs
+     */
     public List<Player> getPlayers()
     {
         return players;
     }
 
+     /**
+     * Accesseur du premier joueur
+     *
+     * @return le joueur ayant la tuile numéro 1 
+     */
     public Player getFirstPlayer()
     {
         Player firstPlayer = players.get(0);
@@ -81,12 +108,22 @@ public class Game {
 
         return firstPlayer;
     }
-
+    
+     /**
+     * Accesseur des disks
+     *
+     * @return une liste de disks
+     */
     public ArrayList<Disk> getDisks()
     {
         return disks;
     }
 
+     /**
+     * Accesseur du Centre du plateau de jeu
+     *
+     * @return le centre
+     */
     public Center getCenter()
     {
         return center;
