@@ -17,13 +17,18 @@ public class View_Accueil extends JFrame
     private ArrayList<JTextField> listePseudos = new ArrayList<>();
     private final ArrayList<JButton> listeBtnsPremierJoueur = new ArrayList<>();
 
+    /**
+     * Initialise quelques paramètres (police, taille de la fenêtre)
+     * Crée une fenêtre demandant le nombre de joueurs
+     */
     public View_Accueil()
     {
         super("AZUL UTBM - Accueil");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(MAXIMIZED_BOTH);
-        setMinimumSize(Toolkit.getDefaultToolkit().getScreenSize());
+        setMinimumSize(Toolkit.getDefaultToolkit().getScreenSize()); // Fenêtre plein écran
 
+        // Change la police par défaut
         Enumeration<Object> keys = UIManager.getDefaults().keys();
         while (keys.hasMoreElements()) {
             Object key = keys.nextElement();
@@ -32,22 +37,34 @@ public class View_Accueil extends JFrame
                 UIManager.put (key, new javax.swing.plaf.FontUIResource("Futura",Font.BOLD,14));
         }
 
+        // Instancie le bouton de validation des pseudos des joueurs
         btnValider = new JButton("Valider");
 
         // D'abord on demande le nombre de joueurs
         loadNewPanel(new PanNbJoueurs());
     }
 
+    /**
+     * Charge le panel du choix des pseudos des joueurs
+     * @param nbJoueurs Nombre de joueurs
+     */
     private void loadPanPseudos(int nbJoueurs)
     {
         loadNewPanel(new PanPseudosJoueurs(nbJoueurs));
     }
 
+    /**
+     * Charge le panel du choix du premier joueur
+     */
     public void loadPanAskPremierJoueur()
     {
         loadNewPanel(new PanChoixPremierJoueur(getPseudos()));
     }
 
+    /**
+     * Charge un nouveau panel
+     * @param pan Panel à charger
+     */
     private void loadNewPanel(JPanel pan)
     {
         JPanel content = new JPanel();
@@ -57,16 +74,28 @@ public class View_Accueil extends JFrame
         validate();
     }
 
+    /**
+     * Récupère le bouton de validation des pseudos, pour l'utiliser dans le contrôleur
+     * @return Bouton de validation
+     */
     public JButton getBtnValider()
     {
         return btnValider;
     }
 
+    /**
+     * Récupère la liste des boutons des joueurs pouvant, utilisés pour choisir le premier joueur
+     * @return Liste de boutons
+     */
     public ArrayList<JButton> getListeBtnsPremierJoueur()
     {
         return listeBtnsPremierJoueur;
     }
 
+    /**
+     * Récupère la liste des pseudos renseignés dans le formulaire
+     * @return Liste de pseudos
+     */
     public ArrayList<String> getPseudos()
     {
         ArrayList<String> pseudos = new ArrayList<>();
@@ -74,6 +103,11 @@ public class View_Accueil extends JFrame
         return pseudos;
     }
 
+    /**
+     * Vérifie tous les pseudos renseignés
+     * Les pseudos ne doivent pas être vides et ne doivent pas être en double
+     * @return True si aucun problème avec les pseudos, sinon False
+     */
     public boolean verifyPseudos()
     {
         boolean isVerified = true;
@@ -104,6 +138,9 @@ public class View_Accueil extends JFrame
         return isVerified;
     }
 
+    /**
+     * Classe interne privée générant le panel demandant le nombre de joueurs
+     */
     private class PanNbJoueurs extends JPanel
     {
 
@@ -137,6 +174,9 @@ public class View_Accueil extends JFrame
         }
     }
 
+    /**
+     * Classe interne privée générant le panel demandant les pseudos des joueurs
+     */
     private class PanPseudosJoueurs extends JPanel
     {
         private PanPseudosJoueurs(int nbJoueurs)
@@ -179,6 +219,9 @@ public class View_Accueil extends JFrame
         }
     }
 
+    /**
+     * Classe interne privée générant le panel demandant le premier joueur
+     */
     private class PanChoixPremierJoueur extends JPanel
     {
         private PanChoixPremierJoueur(ArrayList<String> pseudos)
@@ -212,6 +255,9 @@ public class View_Accueil extends JFrame
         }
     }
 
+    /**
+     * Classe interne privée expliquant les règles
+     */
     private class PanRegles extends JPanel
     {
         private PanRegles()

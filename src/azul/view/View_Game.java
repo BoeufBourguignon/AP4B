@@ -23,7 +23,10 @@ public class View_Game extends JFrame
     private final ArrayList<PanDisk> listPanDisks = new ArrayList<>();
     private PanDisk panCenter;
 
-
+    /**
+     * Constructeur de la fenêtre affichant les éléments du jeu (disques, plateaux de jeu)
+     * @param game Proxy du modèle
+     */
     public View_Game(Game game)
     {
         super("AZUL UTBM");
@@ -48,6 +51,9 @@ public class View_Game extends JFrame
         setMinimumSize(Toolkit.getDefaultToolkit().getScreenSize());
     }
 
+    /**
+     * Initialise la vue des éléments du jeu, en se basant sur les données du modèle
+     */
     public void initGame()
     {
         // Partie supérieure : Disques
@@ -119,46 +125,70 @@ public class View_Game extends JFrame
             }
             panGameboards.add(gb, c);
         }
-
-//        game.getPlayers().forEach(player -> {
-//            PanGameboard gb = new PanGameboard(player);
-//            listPanGameboards.put(player, gb);
-//            panGameboards.add(gb);
-//        });
     }
 
+    /**
+     * Accesseur de la liste des panels des disques
+     * @return Liste de panels
+     */
     public ArrayList<PanDisk> getListPanDisks()
     {
         return listPanDisks;
     }
 
+    /**
+     * Accesseur du panel du centre
+     * @return Panel
+     */
     public PanDisk getCenterPanDisk()
     {
         return panCenter;
     }
 
+    /**
+     * Récupère une map qui associe à chaque joueur le panel de sa gameboard
+     * @return Map des joueurs et la vue de leur gameboard
+     */
     public HashMap<Player, PanGameboard> getListPanGameboards()
     {
         //return new ArrayList<>(listPanGameboards.values());
         return listPanGameboards;
     }
 
+    /**
+     * Active o désactive tous les disques
+     * @param state True si activés, False sinon
+     */
     public void setDisksEnabled(boolean state)
     {
         listPanDisks.forEach(panDisk -> panDisk.getListBtnTiles().forEach(btn -> btn.setEnabled(state)));
         panCenter.getListBtnTiles().forEach(btn -> btn.setEnabled(state));
     }
 
+    /**
+     * Active ou désactive toutes les gameboards
+     * @param state True si activées, False sinon
+     */
     public void setGameboardsEnabled(boolean state)
     {
         listPanGameboards.values().forEach(panGb -> panGb.setGameboardEnabled(state));
     }
 
+    /**
+     * Récupère la map d'un joueur et de sa gameboard
+     * @param player Player dont on souhaite récupérer la vue de la gameboard
+     * @return Le player et sa gameboard
+     */
     public Map.Entry<Player, PanGameboard> getPlayerGameboard(Player player)
     {
         return new AbstractMap.SimpleEntry<>(player, listPanGameboards.get(player));
     }
 
+    /**
+     * Récupère la couleur d'une tuile pour la vue
+     * @param type Type de la tuile
+     * @return Couleur de la tuile
+     */
     private Color getTileColor(TileType type)
     {
         Color color = Color.LIGHT_GRAY;
@@ -199,6 +229,9 @@ public class View_Game extends JFrame
             drawDisk();
         }
 
+        /**
+         * Dessine le disk selon l'instance de disk en attribut
+         */
         public void drawDisk()
         {
             removeAll();
@@ -212,16 +245,29 @@ public class View_Game extends JFrame
             });
         }
 
+        /**
+         * Récupère les boutons de toutes les tuiles du disque
+         * @return Liste de boutons
+         */
         public ArrayList<BtnTile> getListBtnTiles()
         {
             return listBtnTiles;
         }
 
+        /**
+         * Récupère le disque du modèle lié à cette vue
+         * @return Référence vers un disque
+         */
         public Disk getDisk()
         {
             return disk;
         }
 
+        /**
+         * Supprime le type de tuile sélectionné sur une vue d'un disque
+         * @param panDisk Vue du disque ciblé
+         * @param type Type de tuile à supprimer
+         */
         public void pickTiles(PanDisk panDisk, TileType type)
         {
             // Si disk normal : on supprime les tiles du disk et on ajoute les autres au centre (que dans la liste)
@@ -251,7 +297,9 @@ public class View_Game extends JFrame
             }
         }
 
-
+        /**
+         * Bouton illustrant une seule tuile
+         */
         public class BtnTile extends JButton
         {
             private final Tile tile;
@@ -270,6 +318,10 @@ public class View_Game extends JFrame
                 }
             }
 
+            /**
+             * Accesseur de la tuile du modèle liée à la vue
+             * @return Référence vers une tuile
+             */
             public Tile getTile()
             {
                 return tile;
@@ -277,6 +329,9 @@ public class View_Game extends JFrame
         }
     }
 
+    /**
+     * JPanel illustrant une seul gameboard
+     */
     public class PanGameboard extends JPanel
     {
         private final Player player;
@@ -332,6 +387,9 @@ public class View_Game extends JFrame
             drawScore();
         }
 
+        /**
+         * Met à jour uniquement le stock
+         */
         public void drawStock()
         {
             panStock.removeAll();
@@ -362,6 +420,9 @@ public class View_Game extends JFrame
             }
         }
 
+        /**
+         * Met à jour uniquement le mur
+         */
         public void drawWall()
         {
             panWall.removeAll();
@@ -397,6 +458,9 @@ public class View_Game extends JFrame
             }
         }
 
+        /**
+         * Dessine uniquement les boutons, un bouton étant associé à une ligne du stock et du mur
+         */
         private void drawBtns()
         {
             panBtns.setLayout(new GridLayout(5,1));
@@ -409,6 +473,9 @@ public class View_Game extends JFrame
             }
         }
 
+        /**
+         * Met à jour uniquement le malus
+         */
         public void drawMalus()
         {
             panMalus.removeAll();
@@ -440,38 +507,63 @@ public class View_Game extends JFrame
             }
         }
 
+        /**
+         * Met à jour uniquement le score
+         */
         public void drawScore()
         {
             score.setText("Score : " + player.getGameboard().getScore());
         }
 
+        /**
+         * Récupère les boutons des lignes du stock et du wall
+         * @return Liste de boutons
+         */
         public ArrayList<BtnRow> getListRowsBtns()
         {
             return listRowsBtns;
         }
 
+        /**
+         * Récupère le bouton du malus, servant à stocker des tuiles directement dans le malus
+         * @return Bouton
+         */
         public JButton getBtnMalus()
         {
             return btnMalus;
         }
 
+        /**
+         * Récupère la gameboard du modèle liée à la vue
+         * @return Référence vers une gameboard
+         */
         public Gameboard getGameboard()
         {
             return player.getGameboard();
         }
 
+        /**
+         * Active ou désactive la gameboard
+         * @param state True si activé, False sinon
+         */
         public void setGameboardEnabled(boolean state)
         {
             listRowsBtns.forEach(btn -> btn.setEnabled(state));
             btnMalus.setEnabled(state);
         }
 
+        /**
+         * Met la gameboard en évidence dans la vue, pour signaler que son joueur doit jouer
+         * @param isPlaying True si le joueur doit jouer, False sinon
+         */
         public void setPlaying(boolean isPlaying)
         {
             setBackground(isPlaying ? new Color(200, 255, 200) : null);
         }
 
-
+        /**
+         * Bouton illustrant une ligne du stock et du wall
+         */
         public class BtnRow extends JButton
         {
             private final int row;

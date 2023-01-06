@@ -192,6 +192,7 @@ public class AzulController
         {
             boolean isStocked = gb.getGameboard().fillStockline(row, selectedTiles);
 
+            // Si les tuiles sélectionnées ne peuvent pas être stockées sur la ligne choisie, on ne fait rien
             if(isStocked)
             {
                 // On n'a plus besoin de la liste de tuiles sélectionnées
@@ -213,7 +214,7 @@ public class AzulController
                     updateView_Gameboards();
 
 
-                    if( !Verifier_fin().isEmpty() ){
+                    if( !Verifier_fin().isEmpty() ){ // Si quelqu'un a fini
 
 
                         //créer une fenêtre pour dire le gagnant
@@ -254,7 +255,6 @@ public class AzulController
             }
         }
     }
-    //----fonctions Guillaume
 
     /**
      * Décore le mur de tous les joueurs
@@ -424,6 +424,9 @@ public class AzulController
         }
     }
 
+    /**
+     * Met les évènement sur les tuiles des disques
+     */
     private void putEventsOnDisks()
     {
         View_Game V_Game = ((View_Game) window);
