@@ -264,6 +264,10 @@ public class View_Game extends JFrame
                 setMargin(new Insets(1,1,1,1));
                 setPreferredSize(dimTile);
                 setBackground(getTileColor(tile.getType()));
+                if(tile.getType() == TileType.AP)
+                {
+                    setForeground(Color.WHITE);
+                }
             }
 
             public Tile getTile()

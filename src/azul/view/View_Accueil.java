@@ -8,11 +8,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 public class View_Accueil extends JFrame
 {
     JLabel lblVerifyPseudos;
-    private final JButton btnValider = new JButton("Valider");
+    private final JButton btnValider;
     private ArrayList<JTextField> listePseudos = new ArrayList<>();
     private final ArrayList<JButton> listeBtnsPremierJoueur = new ArrayList<>();
 
@@ -22,6 +23,16 @@ public class View_Accueil extends JFrame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(MAXIMIZED_BOTH);
         setMinimumSize(Toolkit.getDefaultToolkit().getScreenSize());
+
+        Enumeration<Object> keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get (key);
+            if (value instanceof javax.swing.plaf.FontUIResource)
+                UIManager.put (key, new javax.swing.plaf.FontUIResource("Futura",Font.BOLD,14));
+        }
+
+        btnValider = new JButton("Valider");
 
         // D'abord on demande le nombre de joueurs
         loadNewPanel(new PanNbJoueurs());
@@ -260,6 +271,10 @@ public class View_Accueil extends JFrame
             panNouvellesTiles.add(createPanTiles(TileType.HS), c);
             c.gridx = 1;
             panNouvellesTiles.add(new JLabel("Hardware & systèmes"), c);
+            c.gridy++; c.gridx = 0;
+            panNouvellesTiles.add(createPanTiles(TileType.First), c);
+            c.gridx = 1;
+            panNouvellesTiles.add(new JLabel("Tuile du premier joueur. Celui qui la pioche jouera en premier au tour suivant"), c);
 
             add(panNouvellesTiles);
 
@@ -292,17 +307,20 @@ public class View_Accueil extends JFrame
             }
             panTiles.add(panTileNormale);
 
-            JPanel panTilePastel = new JPanel();
-            panTilePastel.setPreferredSize(dimTile);
-            switch (type)
+            if(type != TileType.First)
             {
-                case AP -> panTilePastel.setBackground(new Color(159, 182, 255, 150)); // AP
-                case IS -> panTilePastel.setBackground(new Color(255, 255, 200, 150)); // IS
-                case N -> panTilePastel.setBackground(new Color(255, 200, 255, 150)); // N
-                case TCS -> panTilePastel.setBackground(new Color(255, 207, 173, 150)); // TCS
-                case HS -> panTilePastel.setBackground(new Color(200, 255, 200, 150)); // HS
+                JPanel panTilePastel = new JPanel();
+                panTilePastel.setPreferredSize(dimTile);
+                switch (type)
+                {
+                    case AP -> panTilePastel.setBackground(new Color(159, 182, 255, 150)); // AP
+                    case IS -> panTilePastel.setBackground(new Color(255, 255, 200, 150)); // IS
+                    case N -> panTilePastel.setBackground(new Color(255, 200, 255, 150)); // N
+                    case TCS -> panTilePastel.setBackground(new Color(255, 207, 173, 150)); // TCS
+                    case HS -> panTilePastel.setBackground(new Color(200, 255, 200, 150)); // HS
+                }
+                panTiles.add(panTilePastel);
             }
-            panTiles.add(panTilePastel);
 
             return panTiles;
         }
