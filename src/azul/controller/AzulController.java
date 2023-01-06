@@ -4,7 +4,9 @@ import azul.model.*;
 import azul.view.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class AzulController
 {
@@ -56,13 +58,7 @@ public class AzulController
 
             initGame(); // Crée les disks et les gameboards // Le jeu peut commencer
 
-            // On met les évènements sur les boutons des tuiles des disques
-            V_Game.getListPanDisks().forEach(panDisk ->
-                    panDisk.getListBtnTiles().forEach(btnTile ->
-                            btnTile.addActionListener(e -> chooseTiles(panDisk, btnTile.getTile().getType())
-                            )
-                    )
-            );
+            putEventsOnDisks();
 
             // On met les évènements sur les boutons des gamboards
             V_Game.getListPanGameboards().forEach((player, panGb) ->
@@ -156,6 +152,53 @@ public class AzulController
         }
     }
 
+//    private void stockTiles(View_Game.PanGameboard gb, int row)
+//    {
+//        if(selectedTiles != null)
+//        {
+//            boolean isStocked = gb.getGameboard().fillStockline(row, selectedTiles);
+//
+//            if(isStocked)
+//            {
+//                // On n'a plus besoin de la liste de tuiles sélectionnées
+//                selectedTiles = null;
+//                // On recharge la vue du stock du gameboard et du malus
+//                gb.drawStock();
+//                gb.drawMalus();
+//                window.validate();
+//
+//                // Fin du tour de ce joueur
+//                // Vérifions si centre et disk vides
+//                /*
+//
+//                fonction verifier disks & centre : bool
+//                Si plus de tuiles
+//
+//                    fonction faire tous les wall tilling : ArrayList<Tile>
+//                    On fait le wall tilling de tous les joueurs, on récupère les tuiles en trop et on les met dans la défausse
+//                        On compte les points
+//
+//                    fonction compter malus : ArrayList<Tile>
+//                    On compte les points du malus et on met les tuiles du malus dans la défausse (sauf tuile "First")
+//
+//                    fonction verifier_fin : ArrayList<Player>
+//                    On vérifie si c'est la fin
+//                    Si c'est pas la fin (si la taille de la liste est nulle)
+//                        Nouvelle manche
+//                            On remplit le deck avec la discard tant que y'a besoin
+//                            On init les disks et le centre
+//                                Draw 4 tuiles sur chaque disk
+//                                Remet une tuile "First" au centre
+//                    Si c'est la fin, on annonce le gagnant dans une nouvelle fenêtre
+//
+//                 */
+//                nextPlayer();
+//                setChoosingTilesPhase();
+//            }
+//        }
+//    }
+
+    //fonction avec rajout de ce qu'il manquait
     private void stockTiles(View_Game.PanGameboard gb, int row)
     {
         if(selectedTiles != null)
@@ -173,32 +216,254 @@ public class AzulController
 
                 // Fin du tour de ce joueur
                 // Vérifions si centre et disk vides
-                /*
-
-                fonction verifier disks & centre : bool
+                 /*
                 Si plus de tuiles
-
-                    fonction faire tous les wall tilling : ArrayList<Tile>
-                    On fait le wall tilling de tous les joueurs, on récupère les tuiles en trop et on les met dans la défausse
-                        On compte les points
-
-                    fonction compter malus : ArrayList<Tile>
-                    On compte les points du malus et on met les tuiles du malus dans la défausse (sauf tuile "First")
-
-                    fonction verifier_fin : ArrayList<Player>
-                    On vérifie si c'est la fin
-                    Si c'est pas la fin (si la taille de la liste est nulle)
-                        Nouvelle manche
-                            On remplit le deck avec la discard tant que y'a besoin
-                            On init les disks et le centre
-                                Draw 4 tuiles sur chaque disk
-                                Remet une tuile "First" au centre
+                   // On fait le wall tilling de tous les joueurs, on récupère les tuiles en trop et on les met dans la défausse
+                       // On compte les points
+                    //(inclus dans le calcul du score -> )On compte les points du malus
+                     //on met les tuiles du malus dans la défausse (sauf tuile "First")
+                   // On vérifie si c'est la fin
+                    //Si c'est pas la fin
+                        //Nouvelle manche
+                            //On remplit le deck avec la discard tant que y'a besoin
+                            //On init les disks et le centre
+                                //Draw 4 tuiles sur chaque disk
+                                //Remet une tuile "First" au centre
                     Si c'est la fin, on annonce le gagnant dans une nouvelle fenêtre
-
                  */
+                // Ajout commence ici
+                boolean are_empty = verifierFinManche(); //disks + centre sont vides
+
+                if(are_empty){
+                    DecorerMur();
+
+                    calculerScores();
+                    MalusToDiscard();
+                    retirerTile1();// enlève le "1" du gameboard où elle se trouve et la met dans le Center pour la manche suivante
+                    //Actualisation des gameboards
+                    ((View_Game) window).getListPanGameboards().forEach((player, gbs) -> {
+                        //On met à jour les murs dans la vue
+                        gbs.drawWall();
+                        gbs.drawStock();
+                        //On met à jour la zone malus
+                        gbs.drawMalus();
+                    });
+                    //On met à jour le centre (avec la tuile 1)
+                    ((View_Game) window).getCenterPanDisk().drawDisk();
+                    window.validate();
+
+
+                    if( !Verifier_fin().isEmpty() ){
+
+
+                        //créer une fenêtre pour dire le gagnant
+                        JFrame annonce_gagnant = new JFrame();// on créé une fenêtre pour display le gagnant
+                        annonce_gagnant.setLayout(new BorderLayout());
+                        annonce_gagnant.setTitle("Le gagnant !");
+                        //Définit sa taille : 400 pixels de large et 200 pixels de haut
+                        annonce_gagnant.setSize(400, 200);
+                        JLabel label = new JLabel("Le gagnant est:" + AnnoncerGagnant() );
+                        label.setHorizontalAlignment(SwingConstants.CENTER);
+                        annonce_gagnant.add(label, BorderLayout.CENTER);
+
+                        annonce_gagnant.setLocationRelativeTo(null);
+                        annonce_gagnant.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        annonce_gagnant.setVisible(true);
+
+
+                    }else{
+
+                        assezDeTuiles(); // s'il n'y a pas plus assez de tiles dans le deck, on remplit celui-ci avec la discard
+                        fillDisks(); // remplissage des disks
+                        // Réaffichage des disks
+                        ((View_Game) window).getListPanDisks().forEach(View_Game.PanDisk::drawDisk);
+                        ((View_Game) window).getCenterPanDisk().drawDisk();
+                        window.validate();
+                        //Reaffectation des events sur les disks
+                        putEventsOnDisks();
+                    }
+                }
+
                 nextPlayer();
                 setChoosingTilesPhase();
             }
         }
+    }
+    //----fonctions Guillaume
+
+    /**
+     * Décore le mur de tous les joueurs
+     */
+    private void DecorerMur(){
+
+        List<Player> joueurs =  game.getPlayers(); //on récup les joueurs
+        List<Tile> unused_tiles;
+
+        Discard discard_content = game.getDiscard();
+
+        for (Player joueur : joueurs) {
+
+            Gameboard jeu = joueur.getGameboard(); // on récup le gamebord du joueur
+            unused_tiles = jeu.wallTilling(); // on remplit le tableau du joueur
+
+            discard_content.getDiscard().addAll(unused_tiles); // on ajoute toutes les tiles non utilisée à la discard
+        }
+    }
+
+    /**
+     * vérifie si un on est dans une situation de victoire
+     * @return la liste des joueurs présentant une situation gagnante
+     */
+    private List<Player> Verifier_fin(){
+
+        List<Player> joueurs =  game.getPlayers(); //on récup les joueurs
+        List<Player> gagnants = new ArrayList<>();
+
+        for(int i = 0;i<joueurs.size();i++){
+
+            Gameboard jeu = joueurs.get(i).getGameboard(); // on récup le gameboard de chaque joueur
+            for(int ligne = 0;ligne<5;ligne++) {
+
+                if (jeu.checkLignePleine(ligne)) {//on regarde si une ligne de 5 tiles est pleine
+
+                    if (!gagnants.contains(joueurs.get(i))) { //si le joueur n'est pas encore dans la liste des gagnants
+                        gagnants.add(joueurs.get(i)); //on récup le/les joueur/s qui a/ont gagné/s
+                    }
+                }
+            }
+        }
+        return gagnants; // liste des gagnants
+    }
+
+    /**
+     * calcule le score pour chaque joueur
+     */
+    private void calculerScores(){
+
+        List<Player> joueurs =  game.getPlayers();
+
+        for (Player joueur : joueurs) {
+
+            Gameboard jeu = joueur.getGameboard(); // on récup le gameboard de chaque joueur
+            jeu.computeScore(); // on calcule le score de chaque joueur
+        }
+    }
+
+    /**
+     * vérifie si les Disks et le center sont vides
+     * @return True (les 2 sont vides) sinon false
+     */
+    private boolean verifierFinManche() {
+
+        ArrayList<Disk> disks = game.getDisks();
+        boolean tout_les_disks_vides = false;
+        int nb_disk_vides = 0;
+
+        for (Disk disk : disks) { //on regarde pour chaque disk s'il est vide
+
+            if (disk.getTiles().size() == 0) { // disk vide ?
+                nb_disk_vides++;
+            }
+        }
+
+        if (nb_disk_vides == disks.size() && game.getCenter().getTiles().size() == 0) { // si tous les disks sont vides
+            tout_les_disks_vides = true;
+        }
+
+        return tout_les_disks_vides;
+    }
+
+
+    /**
+     * recharge le Deck  avec le contenu de la Discard s'il il n'y a plus assez de Tiles dans celui-ci pour remplir les Disks
+     */
+    private void assezDeTuiles(){
+
+        List<Tile> deck = game.getDeck().getDeck(); // on récup le contenu du Deck du jeu
+
+        while( deck.size() < (game.getDisks().size()*4) ){ //s'il n'y a pas assez de tuiles pour remplir tous les disks du jeu
+
+            Discard discard = game.getDiscard(); // on récup la discard
+            Tile tile_recuperee = discard.drawTile(); // on pioche une tile
+            deck.add(tile_recuperee); // on l'ajoute au deck
+        }
+    }
+
+    /**
+     * envoie les Tiles contenues dans le malus de chaque joueur vers la Discard
+     */
+    private void MalusToDiscard(){
+
+        List<Player> joueurs =  game.getPlayers();
+
+        for (Player joueur : joueurs) {
+
+            Gameboard jeu = joueur.getGameboard(); // on récup le gameboard de chaque joueur
+            Discard discard = game.getDiscard(); // on récup la discard
+            discard.getDiscard().addAll(jeu.clearMalus()); // on ajoute toutes les tiles du malus à la discard ( sans prendre la tile "1" si elle y est)
+        }
+    }
+
+    private Player AnnoncerGagnant() {
+        List<Player> Gagnant_s = Verifier_fin();
+        int numG = 0;
+        if (Gagnant_s.size() > 1) {
+            List<Player> joueurs = game.getPlayers();
+            int lignemax = 0, ligne_complete = 0;
+            for (int i = 0; i < Gagnant_s.size(); i++) {
+                Gameboard gameboardGG = joueurs.get(i).getGameboard(); //recuperation gameboard gagnants
+                ligne_complete = gameboardGG.getCompteur_lignes_completes();
+                if (lignemax < ligne_complete) {
+                    lignemax = ligne_complete;
+                    numG = i;
+                }
+            }
+        }
+        return Gagnant_s.get(numG);
+    }
+
+    /**
+     * retire la Tile "first" du Gameboard où elle se trouve et est positionné dans le Center
+     */
+    private void retirerTile1(){
+
+        List<Player> joueurs =  game.getPlayers();
+
+        for (Player joueur : joueurs) {
+
+            Gameboard jeu = joueur.getGameboard(); // on récup le gameboard de chaque joueur
+            if (jeu.removeTile_First()) { //si on a trouvé la Tile "1" dans le gameboard
+                game.getCenter().setFirstTile();
+            }
+        }
+    }
+
+    /**
+     * remplissage des Disks pour la manche suivante
+     */
+    private void fillDisks(){
+
+        for(Disk disk : game.getDisks()){
+
+            int number_of_tiles = 0;
+
+            while(number_of_tiles < 4){ //tant qu'il n'y a pas 4 tiles dans le disk on en pioche une du deck
+                Tile tile_to_add = game.getDeck().drawTile();
+                disk.add(tile_to_add); // on ajoute la tile
+                number_of_tiles++;
+            }
+        }
+    }
+
+    private void putEventsOnDisks()
+    {
+        View_Game V_Game = ((View_Game) window);
+        // On met les évènements sur les boutons des tuiles des disques
+        V_Game.getListPanDisks().forEach(panDisk ->
+                panDisk.getListBtnTiles().forEach(btnTile ->
+                        btnTile.addActionListener(e -> chooseTiles(panDisk, btnTile.getTile().getType())
+                        )
+                )
+        );
     }
 }

@@ -6,7 +6,7 @@ public class Game {
     private int nbPlayer;
     private int nbDisk;
     private Deck deck;
-    private ArrayList<Tile> discard;
+    private Discard discard;
     private final ArrayList<Player> players;
     private ArrayList<Disk> disks;
     private Center center;
@@ -32,7 +32,7 @@ public class Game {
         deck = new Deck();
 
         // Instanciation du discard
-        discard = new ArrayList<>();
+        discard = new Discard();
 
         // Instanciation des disks
         nbDisk = 2 * nbPlayer + 1;
@@ -48,6 +48,11 @@ public class Game {
         }
 
         center = new Center();
+    }
+
+    public Discard getDiscard()
+    {
+        return discard;
     }
 
     public void setNbPlayer(int nbPlayer) {
@@ -90,6 +95,11 @@ public class Game {
     public Center getCenter()
     {
         return center;
+    }
+
+    public Deck getDeck()
+    {
+        return deck;
     }
 
     public ArrayList<Tile> playerPickTile(Player player, Disk disk, TileType type)

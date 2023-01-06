@@ -24,6 +24,7 @@ public class Center extends Disk {
      */
     public void setFirstTile() {
         this.FirstTile = new Tile(TileType.First);
+        disk.add(0, FirstTile);
     }
 
     /**
