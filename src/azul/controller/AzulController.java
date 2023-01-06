@@ -15,6 +15,11 @@ public class AzulController
     private Map.Entry<Player, View_Game.PanGameboard> currentPlayerAndGameboard;
     private ArrayList<Tile> selectedTiles = null;
 
+    /**
+     * Instancie un objet Game
+     * Crée et affiche la fenêtre d'accueil
+     * Ajoute un event listener sur le bouton "valider" lorsque les pseudos des joueurs ont été renseignés
+     */
     public AzulController()
     {
         game = new Game();
@@ -26,6 +31,10 @@ public class AzulController
         window.setVisible(true);
     }
 
+    /**
+     * Vérifie la validité des pseudos entrés
+     * Charge la fenêtre d'accueil demandant le premier joueur
+     */
     private void askFirstPlayer()
     {
         if(((View_Accueil) window).verifyPseudos())
@@ -37,55 +46,61 @@ public class AzulController
         }
     }
 
+    /**
+     * Instancie les objets nécessaires au démarrage de la partie (disques, joueurs)
+     * Crée la fenêtre du jeu
+     * Charge les events sur les disks
+     * @param pseudoFirstPlayer Pseudo du premier joueur
+     */
     private void startGame(String pseudoFirstPlayer)
     {
-        // On vérifie les pseudos
-        if(((View_Accueil) window).verifyPseudos())
-        {
-            window.dispose();
+        window.dispose();
 
-            // On crée les classes "Player" et on les ajoute au Game
-            ((View_Accueil) window).getPseudos().forEach(pseudo -> {
-                Player player = new Player(pseudo);
-                game.addPlayer(player);
-                if(pseudo.equals(pseudoFirstPlayer))
-                    game.setFirstPlayer(player);
-            });
+        // On crée les classes "Player" et on les ajoute au Game
+        ((View_Accueil) window).getPseudos().forEach(pseudo -> {
+            Player player = new Player(pseudo);
+            game.addPlayer(player);
+            if(pseudo.equals(pseudoFirstPlayer))
+                game.setFirstPlayer(player);
+        });
 
-            // On crée la fenêtre de jeu
-            window = new View_Game(game);
-            View_Game V_Game = ((View_Game) window);
+        // On crée la fenêtre de jeu
+        window = new View_Game(game);
+        View_Game V_Game = ((View_Game) window);
 
-            initGame(); // Crée les disks et les gameboards // Le jeu peut commencer
+        initGame(); // Crée les disks et les gameboards // Le jeu peut commencer
 
-            putEventsOnDisks();
+        putEventsOnDisks();
 
-            // On met les évènements sur les boutons des gamboards
-            V_Game.getListPanGameboards().forEach((player, panGb) ->
-                    panGb.getListRowsBtns().forEach(btn     ->
-                            btn.addActionListener(e -> stockTiles(panGb, btn.getRow())
-                            )
-                    )
-            );
+        // On met les évènements sur les boutons des gamboards
+        V_Game.getListPanGameboards().forEach((player, panGb) ->
+                panGb.getListRowsBtns().forEach(btn     ->
+                        btn.addActionListener(e -> stockTiles(panGb, btn.getRow())
+                        )
+                )
+        );
 
-            // On met l'event sur le bouton de malus
-            V_Game.getListPanGameboards().forEach((player, panGb) ->
-                    panGb.getBtnMalus().addActionListener(e -> stockTiles(panGb, 5))
-            );
+        // On met l'event sur le bouton de malus
+        V_Game.getListPanGameboards().forEach((player, panGb) ->
+                panGb.getBtnMalus().addActionListener(e -> stockTiles(panGb, 5))
+        );
 
-            // On indique le premier joueur
-            currentPlayerAndGameboard = V_Game.getPlayerGameboard(game.getFirstPlayer());
-            ((View_Game) window).getListPanGameboards().forEach((p, gb) -> gb.setPlaying(false));
-            currentPlayerAndGameboard.getValue().setPlaying(true);
-            currentPlayerAndGameboard.getKey().setFirstPlayer(false);
+        // On indique le premier joueur
+        currentPlayerAndGameboard = V_Game.getPlayerGameboard(game.getFirstPlayer());
+        ((View_Game) window).getListPanGameboards().forEach((p, gb) -> gb.setPlaying(false));
+        currentPlayerAndGameboard.getValue().setPlaying(true);
+        currentPlayerAndGameboard.getKey().setFirstPlayer(false);
 
-            // Et on l'autorise à jouer
-            setChoosingTilesPhase();
+        // Et on l'autorise à jouer
+        setChoosingTilesPhase();
 
-            window.setVisible(true);
-        }
+        window.setVisible(true);
     }
 
+    /**
+     * Initialise le modèle
+     * Initalise la vue du jeu, qui est liée au modèle
+     */
     private void initGame()
     {
         try
@@ -102,7 +117,10 @@ public class AzulController
         }
     }
 
-    public void nextPlayer()
+    /**
+     * Met à jour le joueur courrant avec le prochain joueur
+     */
+    private void nextPlayer()
     {
         int currentIndex = game.getPlayers().indexOf(currentPlayerAndGameboard.getKey());
         currentIndex = (currentIndex + 1) % game.getPlayers().size();
@@ -113,6 +131,9 @@ public class AzulController
         currentPlayerAndGameboard.getKey().setFirstPlayer(false);
     }
 
+    /**
+     * Desactive les gameboards et active les disques
+     */
     private void setChoosingTilesPhase()
     {
         // Desactive tous les gameboards
@@ -121,6 +142,9 @@ public class AzulController
         ((View_Game) window).setDisksEnabled(true);
     }
 
+    /**
+     * Desactive les disques et active les gameboards
+     */
     private void setStockingTilePhase()
     {
         // Desactive les disks
@@ -129,12 +153,17 @@ public class AzulController
         currentPlayerAndGameboard.getValue().setGameboardEnabled(true);
     }
 
+    /**
+     * Permet au joueur courrant de choisir un type de tuiles sur un disk
+     * Le type de la tuile est déterminé selon quel bouton de tuile a été cliqué
+     * @param panDisk Vue du disque où le type de tuile a été choisi
+     * @param type Type de tuile choisi
+     */
     private void chooseTiles(View_Game.PanDisk panDisk, TileType type)
     {
         if(selectedTiles == null)
         {
             selectedTiles = game.playerPickTile(currentPlayerAndGameboard.getKey(), panDisk.getDisk(), type);
-
 
             panDisk.pickTiles(panDisk, type);
 
@@ -152,7 +181,11 @@ public class AzulController
         }
     }
 
-    //fonction avec rajout de ce qu'il manquait
+    /**
+     * Permet de stocker des tuiles sélectionnées sur une ligne du stock d'un gameboard
+     * @param gb Vue du gameboard du joueur courrant
+     * @param row Ligne de stock choisie
+     */
     private void stockTiles(View_Game.PanGameboard gb, int row)
     {
         if(selectedTiles != null)
@@ -204,10 +237,19 @@ public class AzulController
                         fillDisks(); // remplissage des disks
                         // Réaffichage des disks
                         updateView_Disks();
+
+                        //Le prochain joueur est celui qui a la tuile first
+                        currentPlayerAndGameboard = ((View_Game) window).getPlayerGameboard(game.getFirstPlayer());
+                        ((View_Game) window).getListPanGameboards().forEach((p, gbs) -> gbs.setPlaying(false));
+                        currentPlayerAndGameboard.getValue().setPlaying(true);
+                        currentPlayerAndGameboard.getKey().setFirstPlayer(false);
                     }
                 }
+                else {
+                    //Le prochaine joueur est celui qui vient dans l'ordre
+                    nextPlayer();
+                }
 
-                nextPlayer();
                 setChoosingTilesPhase();
             }
         }
@@ -327,6 +369,10 @@ public class AzulController
         }
     }
 
+    /**
+     * Détermine un unique gagnant
+     * @return Le gagnant unique
+     */
     private Player AnnoncerGagnant() {
         List<Player> Gagnant_s = Verifier_fin();
         int numG = 0;
@@ -390,6 +436,9 @@ public class AzulController
         );
     }
 
+    /**
+     * Met la vue du gameboard a jour
+     */
     private void updateView_Gameboards()
     {
         ((View_Game) window).getListPanGameboards().forEach((player, gbs) -> {
@@ -406,6 +455,9 @@ public class AzulController
         window.validate();
     }
 
+    /**
+     * Met la vue du disk à jour
+     */
     private void updateView_Disks()
     {
         ((View_Game) window).getListPanDisks().forEach(View_Game.PanDisk::drawDisk);

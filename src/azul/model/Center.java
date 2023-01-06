@@ -38,7 +38,9 @@ public class Center extends Disk {
 
         if(FirstTile != null)
         {
-            liste_retournee.add(FirstTile);
+            if(!liste_retournee.contains(FirstTile)){
+                liste_retournee.add(FirstTile);
+            }
             disk.remove(FirstTile);
             FirstTile = null;
         }
