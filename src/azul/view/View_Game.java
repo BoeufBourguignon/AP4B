@@ -44,6 +44,8 @@ public class View_Game extends JFrame
         add(panGameboards, c);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setExtendedState(MAXIMIZED_BOTH);
+        setMinimumSize(Toolkit.getDefaultToolkit().getScreenSize());
     }
 
     public void initGame()
@@ -123,8 +125,6 @@ public class View_Game extends JFrame
 //            listPanGameboards.put(player, gb);
 //            panGameboards.add(gb);
 //        });
-
-        pack();
     }
 
     public ArrayList<PanDisk> getListPanDisks()
@@ -377,11 +377,11 @@ public class View_Game extends JFrame
                     {
                         switch (referenceWall.get(i).get(j))
                         {
-                            case AP -> panTileTmp.setBackground(new Color(159, 182, 255, 70)); // AP
-                            case IS -> panTileTmp.setBackground(new Color(255, 255, 200, 70)); // IS
-                            case N -> panTileTmp.setBackground(new Color(255, 200, 255, 70)); // N
-                            case TCS -> panTileTmp.setBackground(new Color(255, 207, 173, 70)); // TCS
-                            case HS -> panTileTmp.setBackground(new Color(200, 255, 200, 70)); // HS
+                            case AP -> panTileTmp.setBackground(new Color(159, 182, 255, 150)); // AP
+                            case IS -> panTileTmp.setBackground(new Color(255, 255, 200, 150)); // IS
+                            case N -> panTileTmp.setBackground(new Color(255, 200, 255, 150)); // N
+                            case TCS -> panTileTmp.setBackground(new Color(255, 207, 173, 150)); // TCS
+                            case HS -> panTileTmp.setBackground(new Color(200, 255, 200, 150)); // HS
                         }
                     }
                     else
